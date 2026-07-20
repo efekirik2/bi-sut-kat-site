@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bi Üst Kat — Gümüşlük Kebap</title>
+  <!-- Yönetim paneli girişi (Netlify Identity) -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <style>
     :root {
       --bg: #17110c;
@@ -289,6 +291,17 @@
       ]}
     ]
   }
+  </script>
+
+  <script>
+    // Davet linkiyle gelen kullanıcıyı, giriş sonrası panele yönlendir
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.on("init", function(user){
+        if (!user) {
+          window.netlifyIdentity.on("login", function(){ document.location.href = "/admin/"; });
+        }
+      });
+    }
   </script>
 
   <script>
