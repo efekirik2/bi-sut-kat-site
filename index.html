@@ -193,32 +193,7 @@
       <span>Şefin Önerileri</span>
       <h2>Öne Çıkan Lezzetler</h2>
     </div>
-    <div class="featured">
-      <div class="dish">
-        <img src="image/WhatsApp%20Image%202026-07-20%20at%2010.24.21%20(5).jpeg" alt="Adana Kebap" />
-        <div class="body">
-          <h3>Adana Kebap</h3>
-          <p class="desc">Közde pişmiş acılı kebap, peynirli pide, közlenmiş domates-biber ve soğan salatası ile</p>
-          <div class="price">₺900</div>
-        </div>
-      </div>
-      <div class="dish">
-        <img src="image/WhatsApp%20Image%202026-07-20%20at%2010.24.21%20(4).jpeg" alt="Arnavut Ciğeri" />
-        <div class="body">
-          <h3>Arnavut Ciğeri</h3>
-          <p class="desc">Çıtır kızartılmış ciğer, el kesimi patates, roka ve sumaklı soğan salatası ile</p>
-          <div class="price">₺800</div>
-        </div>
-      </div>
-      <div class="dish">
-        <img src="image/WhatsApp%20Image%202026-07-20%20at%2010.24.21%20(3).jpeg" alt="Ciğer" />
-        <div class="body">
-          <h3>Kavurma Tabağı</h3>
-          <p class="desc">Bol porsiyon kavurma, patates kızartması, domates ve közlenmiş biber ile</p>
-          <div class="price">₺800</div>
-        </div>
-      </div>
-    </div>
+    <div class="featured" id="featured"><!-- İçerik content/menu.json dosyasından otomatik yüklenir --></div>
   </section>
 
   <!-- ATMOSPHERE -->
@@ -243,35 +218,7 @@
       <h2>Menü</h2>
     </div>
 
-    <div class="menu-category">
-      <h3>Başlangıçlar & Mezeler</h3>
-      <div class="menu-item"><div class="info"><h4>Arnavut Ciğeri</h4><p>Çıtır ciğer, sumaklı soğan salatası ile</p></div><div class="price">₺260</div></div>
-      <div class="menu-item"><div class="info"><h4>Humus</h4><p>Nohut, tahin, zeytinyağı</p></div><div class="price">₺95</div></div>
-      <div class="menu-item"><div class="info"><h4>Acılı Ezme</h4><p>Domates, biber, ceviz</p></div><div class="price">₺350</div></div>
-      <div class="menu-item"><div class="info"><h4>Haydari</h4><p>Süzme yoğurt, nane, sarımsak</p></div><div class="price">₺350</div></div>
-    </div>
-
-    <div class="menu-category">
-      <h3>Ana Yemekler / Kebaplar</h3>
-      <div class="menu-item"><div class="info"><h4>Adana Kebap</h4><p>Peynirli pide ve közlenmiş sebze ile</p></div><div class="price">₺900</div></div>
-      <div class="menu-item"><div class="info"><h4>Urfa Kebap</h4><p>Acısız, közlenmiş sebze ile</p></div><div class="price">₺900</div></div>
-      <div class="menu-item"><div class="info"><h4>Kavurma Tabağı</h4><p>Patates kızartması ve salata ile</p></div><div class="price">₺290</div></div>
-      <div class="menu-item"><div class="info"><h4>Karışık Izgara</h4><p>Adana, tavuk, kanat, köfte (2 kişilik)</p></div><div class="price">₺750</div></div>
-      <div class="menu-item"><div class="info"><h4>Tavuk Şiş</h4><p>Marine tavuk, ızgara sebze ile</p></div><div class="price">₺750</div></div>
-    </div>
-
-    <div class="menu-category">
-      <h3>Tatlılar</h3>
-      <div class="menu-item"><div class="info"><h4>Künefe</h4><p>Antep fıstığı ve kaymak ile</p></div><div class="price">₺400</div></div>
-      <div class="menu-item"><div class="info"><h4>Sütlaç</h4><p>Fırında, tarçınlı</p></div><div class="price">₺400</div></div>
-    </div>
-
-    <div class="menu-category">
-      <h3>Soğuk İçecekler</h3>
-      <div class="menu-item"><div class="info"><h4>Ev Yapımı Limonata</h4><p>Taze nane ve limon</p></div><div class="price">₺150</div></div>
-      <div class="menu-item"><div class="info"><h4>Ayran</h4><p>Yayık ayranı</p></div><div class="price">₺150</div></div>
-      <div class="menu-item"><div class="info"><h4>Şalgam Suyu</h4><p>Acılı / acısız</p></div><div class="price">₺100</div></div>
-    </div>
+    <div id="menu-list"><!-- İçerik content/menu.json dosyasından otomatik yüklenir --></div>
   </section>
 
   <!-- CONTACT -->
@@ -308,5 +255,83 @@
   <footer>
     © 2026 Bi Üst Kat Gümüşlük Kebap — Tüm hakları saklıdır.
   </footer>
+
+  <!-- Yerel önizleme için yedek menü verisi (çevrimiçi iken content/menu.json kullanılır) -->
+  <script type="application/json" id="fallback-menu">
+  {
+    "featured": [
+      { "name": "Adana Kebap", "desc": "Közde pişmiş acılı kebap, peynirli pide, közlenmiş domates-biber ve soğan salatası ile", "price": "₺900", "image": "image/WhatsApp Image 2026-07-20 at 10.24.21 (5).jpeg" },
+      { "name": "Arnavut Ciğeri", "desc": "Çıtır kızartılmış ciğer, el kesimi patates, roka ve sumaklı soğan salatası ile", "price": "₺800", "image": "image/WhatsApp Image 2026-07-20 at 10.24.21 (4).jpeg" },
+      { "name": "Kavurma Tabağı", "desc": "Bol porsiyon kavurma, patates kızartması, domates ve közlenmiş biber ile", "price": "₺800", "image": "image/WhatsApp Image 2026-07-20 at 10.24.21 (3).jpeg" }
+    ],
+    "categories": [
+      { "title": "Başlangıçlar & Mezeler", "items": [
+        { "name": "Arnavut Ciğeri", "desc": "Çıtır ciğer, sumaklı soğan salatası ile", "price": "₺260" },
+        { "name": "Humus", "desc": "Nohut, tahin, zeytinyağı", "price": "₺95" },
+        { "name": "Acılı Ezme", "desc": "Domates, biber, ceviz", "price": "₺350" },
+        { "name": "Haydari", "desc": "Süzme yoğurt, nane, sarımsak", "price": "₺350" }
+      ]},
+      { "title": "Ana Yemekler / Kebaplar", "items": [
+        { "name": "Adana Kebap", "desc": "Peynirli pide ve közlenmiş sebze ile", "price": "₺900" },
+        { "name": "Urfa Kebap", "desc": "Acısız, közlenmiş sebze ile", "price": "₺900" },
+        { "name": "Kavurma Tabağı", "desc": "Patates kızartması ve salata ile", "price": "₺290" },
+        { "name": "Karışık Izgara", "desc": "Adana, tavuk, kanat, köfte (2 kişilik)", "price": "₺750" },
+        { "name": "Tavuk Şiş", "desc": "Marine tavuk, ızgara sebze ile", "price": "₺750" }
+      ]},
+      { "title": "Tatlılar", "items": [
+        { "name": "Künefe", "desc": "Antep fıstığı ve kaymak ile", "price": "₺400" },
+        { "name": "Sütlaç", "desc": "Fırında, tarçınlı", "price": "₺400" }
+      ]},
+      { "title": "Soğuk İçecekler", "items": [
+        { "name": "Ev Yapımı Limonata", "desc": "Taze nane ve limon", "price": "₺150" },
+        { "name": "Ayran", "desc": "Yayık ayranı", "price": "₺150" },
+        { "name": "Şalgam Suyu", "desc": "Acılı / acısız", "price": "₺100" }
+      ]}
+    ]
+  }
+  </script>
+
+  <script>
+    function esc(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, function(c){
+      return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c];
+    }); }
+
+    function renderFeatured(list){
+      var el = document.getElementById("featured");
+      el.innerHTML = (list || []).map(function(d){
+        return '<div class="dish">' +
+          '<img src="' + esc(d.image) + '" alt="' + esc(d.name) + '" />' +
+          '<div class="body">' +
+            '<h3>' + esc(d.name) + '</h3>' +
+            '<p class="desc">' + esc(d.desc) + '</p>' +
+            '<div class="price">' + esc(d.price) + '</div>' +
+          '</div></div>';
+      }).join("");
+    }
+
+    function renderMenu(cats){
+      var el = document.getElementById("menu-list");
+      el.innerHTML = (cats || []).map(function(c){
+        var items = (c.items || []).map(function(i){
+          return '<div class="menu-item">' +
+            '<div class="info"><h4>' + esc(i.name) + '</h4><p>' + esc(i.desc) + '</p></div>' +
+            '<div class="price">' + esc(i.price) + '</div></div>';
+        }).join("");
+        return '<div class="menu-category"><h3>' + esc(c.title) + '</h3>' + items + '</div>';
+      }).join("");
+    }
+
+    function apply(data){ renderFeatured(data.featured); renderMenu(data.categories); }
+
+    (function loadMenu(){
+      fetch("content/menu.json", { cache: "no-store" })
+        .then(function(r){ if(!r.ok) throw new Error("no file"); return r.json(); })
+        .then(apply)
+        .catch(function(){
+          try { apply(JSON.parse(document.getElementById("fallback-menu").textContent)); }
+          catch(e){ /* yoksay */ }
+        });
+    })();
+  </script>
 </body>
 </html>

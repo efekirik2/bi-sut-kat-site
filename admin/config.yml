@@ -1,0 +1,47 @@
+backend:
+  name: git-gateway
+  branch: main
+
+# Yüklenen fotoğraflar bu klasöre kaydedilir
+media_folder: "image"
+public_folder: "image"
+
+# Panelin dili
+locale: "tr"
+
+collections:
+  - name: "site"
+    label: "Site İçeriği"
+    files:
+      - name: "menu"
+        label: "Menü"
+        file: "content/menu.json"
+        description: "Menü ürünlerini, fiyatları ve öne çıkan lezzetleri buradan düzenleyin."
+        fields:
+          - label: "Öne Çıkan Lezzetler (fotoğraflı)"
+            name: "featured"
+            widget: "list"
+            label_singular: "Lezzet"
+            summary: "{{fields.name}} — {{fields.price}}"
+            fields:
+              - { label: "Yemek Adı", name: "name", widget: "string" }
+              - { label: "Açıklama", name: "desc", widget: "text" }
+              - { label: "Fiyat", name: "price", widget: "string", hint: "Örnek: ₺900" }
+              - { label: "Fotoğraf", name: "image", widget: "image" }
+
+          - label: "Menü Kategorileri"
+            name: "categories"
+            widget: "list"
+            label_singular: "Kategori"
+            summary: "{{fields.title}}"
+            fields:
+              - { label: "Kategori Başlığı", name: "title", widget: "string" }
+              - label: "Ürünler"
+                name: "items"
+                widget: "list"
+                label_singular: "Ürün"
+                summary: "{{fields.name}} — {{fields.price}}"
+                fields:
+                  - { label: "Ürün Adı", name: "name", widget: "string" }
+                  - { label: "Açıklama", name: "desc", widget: "string" }
+                  - { label: "Fiyat", name: "price", widget: "string", hint: "Örnek: ₺260" }
