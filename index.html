@@ -138,6 +138,18 @@
     .contact .details { color: var(--muted); display: grid; gap: .5rem; margin-top: 1.25rem; font-size: 1.02rem; }
     .contact .details strong { color: var(--text); }
     .contact a { color: var(--accent); text-decoration: none; }
+    .map { margin-top: 2.5rem; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); }
+    .map iframe { display: block; }
+    .socials { margin-top: 1.5rem; }
+    .ig-btn {
+      display: inline-flex; align-items: center; gap: .55rem;
+      padding: .7rem 1.4rem; border-radius: 999px; font-weight: 600;
+      color: #fff; text-decoration: none;
+      background: linear-gradient(45deg, #feda75, #d62976, #962fbf, #4f5bd5);
+      transition: transform .15s, box-shadow .15s;
+    }
+    .ig-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(214,41,118,.4); }
+    .ig-btn svg { width: 22px; height: 22px; fill: #fff; }
 
     footer {
       text-align: center; padding: 1.75rem; color: var(--muted);
@@ -273,6 +285,24 @@
       <div>📞 <strong>Rezervasyon:</strong> <a href="tel:+905335615586">0533 561 55 86</a></div>
       <div>🕐 <strong>Çalışma Saatleri:</strong> Her gün 12:00 – 24:00</div>
     </div>
+
+    <div class="socials">
+      <a class="ig-btn" href="https://www.instagram.com/biustkatgumusluk_" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2c3.2 0 3.6 0 4.9.07 1.2.05 1.8.25 2.2.42.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.17.4.37 1 .42 2.2.06 1.3.07 1.7.07 4.9s0 3.6-.07 4.9c-.05 1.2-.25 1.8-.42 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.17-1 .37-2.2.42-1.3.06-1.7.07-4.9.07s-3.6 0-4.9-.07c-1.2-.05-1.8-.25-2.2-.42-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.17-.4-.37-1-.42-2.2C2.21 15.6 2.2 15.2 2.2 12s0-3.6.07-4.9c.05-1.2.25-1.8.42-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.17 1-.37 2.2-.42C8.4 2.21 8.8 2.2 12 2.2zm0 1.8c-3.1 0-3.5 0-4.7.07-.9.04-1.4.2-1.7.3-.4.17-.7.37-1 .67-.3.3-.5.6-.67 1-.1.3-.26.8-.3 1.7C3.8 8.5 3.8 8.9 3.8 12s0 3.5.07 4.7c.04.9.2 1.4.3 1.7.17.4.37.7.67 1 .3.3.6.5 1 .67.3.1.8.26 1.7.3 1.2.07 1.6.07 4.7.07s3.5 0 4.7-.07c.9-.04 1.4-.2 1.7-.3.4-.17.7-.37 1-.67.3-.3.5-.6.67-1 .1-.3.26-.8.3-1.7.07-1.2.07-1.6.07-4.7s0-3.5-.07-4.7c-.04-.9-.2-1.4-.3-1.7-.17-.4-.37-.7-.67-1-.3-.3-.6-.5-1-.67-.3-.1-.8-.26-1.7-.3C15.5 4 15.1 4 12 4zm0 3.1a4.9 4.9 0 110 9.8 4.9 4.9 0 010-9.8zm0 1.8a3.1 3.1 0 100 6.2 3.1 3.1 0 000-6.2zm5.1-.9a1.15 1.15 0 110 2.3 1.15 1.15 0 010-2.3z"/></svg>
+        @biustkatgumusluk_
+      </a>
+    </div>
+
+    <div class="map">
+      <iframe
+        src="https://yandex.com.tr/map-widget/v1/?ll=27.235679%2C37.054615&z=17&pt=27.235679%2C37.054615%2Cpm2rdm"
+        width="100%" height="380" style="border:0;"
+        allowfullscreen loading="lazy"
+        title="Bi Üst Kat Gümüşlük konumu"></iframe>
+    </div>
+    <p style="margin-top:1rem;">
+      <a href="https://yandex.com.tr/maps/-/CTVCfP5z" target="_blank" rel="noopener">📍 Yol tarifi al</a>
+    </p>
   </section>
 
   <footer>
