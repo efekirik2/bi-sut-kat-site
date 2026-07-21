@@ -137,6 +137,8 @@
     var menuCategories = [];
     var currentTableId = null;
     var pollTimer = null;
+    // Sadece yerel geliştirmede (dev-server.js) Netlify Identity atlanır.
+    var LOCAL = location.hostname === "localhost" || location.hostname === "127.0.0.1";
 
     function showToast(msg) {
       var t = document.getElementById("toast");
@@ -157,6 +159,7 @@
     }
 
     async function authHeaders() {
+      if (LOCAL) return { "Content-Type": "application/json" };
       var user = window.netlifyIdentity.currentUser();
       var token = await user.jwt();
       return { Authorization: "Bearer " + token, "Content-Type": "application/json" };
@@ -323,19 +326,24 @@
       pollTimer = setInterval(fetchTables, 5000);
     }
 
-    window.netlifyIdentity.on("init", function (user) {
-      if (user) startApp();
-    });
-    window.netlifyIdentity.on("login", function () {
-      window.netlifyIdentity.close();
+    if (LOCAL) {
+      // Yerel geliştirme: Identity yok, doğrudan uygulamayı başlat.
       startApp();
-    });
-    window.netlifyIdentity.on("logout", function () {
-      document.getElementById("app").style.display = "none";
-      document.getElementById("login-gate").style.display = "flex";
-      if (pollTimer) clearInterval(pollTimer);
-    });
-    window.netlifyIdentity.init();
+    } else {
+      window.netlifyIdentity.on("init", function (user) {
+        if (user) startApp();
+      });
+      window.netlifyIdentity.on("login", function () {
+        window.netlifyIdentity.close();
+        startApp();
+      });
+      window.netlifyIdentity.on("logout", function () {
+        document.getElementById("app").style.display = "none";
+        document.getElementById("login-gate").style.display = "flex";
+        if (pollTimer) clearInterval(pollTimer);
+      });
+      window.netlifyIdentity.init();
+    }
   </script>
 </body>
 </html>

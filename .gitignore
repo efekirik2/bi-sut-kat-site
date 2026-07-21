@@ -1,0 +1,7 @@
+# Gizli ortam değişkenleri — ASLA repoya girmemeli
+.env
+.env.local
+
+# Bağımlılıklar / araç çıktıları
+node_modules/
+.netlify/
