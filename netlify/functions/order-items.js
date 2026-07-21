@@ -38,6 +38,21 @@ exports.handler = wrap(async (event, context) => {
     return json(201, created);
   }
 
+  if (event.httpMethod === "PATCH") {
+    const id = event.queryStringParameters && event.queryStringParameters.id;
+    if (!id) return json(400, { error: "id gerekli." });
+    const body = JSON.parse(event.body || "{}");
+    const patch = {};
+    if (body.price != null) patch.price = body.price;
+    if (body.quantity != null) patch.quantity = body.quantity;
+    if (!Object.keys(patch).length) return json(400, { error: "Güncellenecek alan yok." });
+    await sb("/order_items?id=eq." + id, {
+      method: "PATCH",
+      body: JSON.stringify(patch),
+    });
+    return json(200, { ok: true });
+  }
+
   if (event.httpMethod === "DELETE") {
     const id = event.queryStringParameters && event.queryStringParameters.id;
     if (!id) return json(400, { error: "id gerekli." });

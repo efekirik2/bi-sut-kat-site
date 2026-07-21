@@ -8,14 +8,14 @@
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <style>
     :root {
-      --bg: #17110c;
-      --surface: #201812;
-      --card: #2a2018;
+      --bg: #ffffff;
+      --surface: #f7f3ee;
+      --card: #ffffff;
       --accent: #e8952e;
       --accent-dark: #cf7f22;
-      --text: #f6ede2;
-      --muted: #b6a591;
-      --line: #3a2e24;
+      --text: #2a2018;
+      --muted: #7a6a58;
+      --line: #e6ddd2;
       --danger: #d9534f;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -28,7 +28,7 @@
     header {
       display: flex; justify-content: space-between; align-items: center;
       padding: 1rem 1.5rem; border-bottom: 1px solid var(--line);
-      position: sticky; top: 0; background: rgba(23,17,12,.95); z-index: 10;
+      position: sticky; top: 0; background: rgba(255,255,255,.96); z-index: 10;
     }
     header h1 { font-size: 1.3rem; color: var(--accent); }
     button {
@@ -54,6 +54,7 @@
     .table-card {
       background: var(--card); border: 1px solid var(--line); border-radius: 14px;
       padding: 1.1rem 1.25rem; display: flex; flex-direction: column;
+      box-shadow: 0 2px 8px rgba(0,0,0,.07);
     }
     .table-card h3 { font-size: 1.1rem; margin-bottom: .5rem; }
     .table-card .items { list-style: none; flex: 1; }
@@ -61,8 +62,13 @@
       display: flex; justify-content: space-between; gap: .5rem; font-size: .88rem;
       padding: .35rem 0; border-bottom: 1px dashed var(--line);
     }
-    .table-card .item-row .info { color: var(--text); }
+    .table-card .item-row .info { color: var(--text); flex: 1; }
     .table-card .item-row .info small { display: block; color: var(--muted); }
+    .table-card .item-row .line-price { display: inline-flex; align-items: center; gap: .1rem; color: var(--accent); font-weight: 700; font-size: .82rem; }
+    .table-card .item-price-input {
+      width: 3.6rem; background: var(--surface); border: 1px solid var(--line); color: var(--accent);
+      border-radius: 6px; padding: .15rem .25rem; text-align: right; font-weight: 700; font-size: .82rem;
+    }
     .table-card .item-row .del {
       background: none; color: var(--muted); padding: 0 .3rem; font-size: 1rem;
     }
@@ -92,6 +98,12 @@
     .menu-pick-row input[type="number"] {
       width: 3rem; background: var(--card); border: 1px solid var(--line); color: var(--text);
       border-radius: 6px; padding: .25rem; text-align: center;
+    }
+    .menu-pick-row .price-input { width: 4.4rem; color: var(--accent); font-weight: 700; }
+    .menu-pick-row .pw { display: inline-flex; align-items: center; gap: .15rem; color: var(--muted); font-size: .8rem; }
+    .panel-hint {
+      color: var(--muted); font-size: .82rem; margin-bottom: .8rem;
+      background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: .5rem .7rem;
     }
     .panel .close-row { display: flex; justify-content: flex-end; margin-top: 1rem; }
     #toast {
@@ -191,12 +203,18 @@
 
     function renderGrid(tables) {
       var grid = document.getElementById("grid");
+      // Kullanıcı bir fiyat kutusunu düzenliyorsa yeniden çizme (yazdığı kaybolmasın)
+      var ae = document.activeElement;
+      if (ae && ae.classList && ae.classList.contains("item-price-input")) return;
       grid.innerHTML = tables.map(function (t) {
         var itemsHtml = (t.items || []).length
           ? t.items.map(function (i) {
               return '<li class="item-row"><span class="info">' + i.quantity + "x " + esc(i.name) +
                 (i.note ? "<small>" + esc(i.note) + "</small>" : "") +
-                '</span><button class="del" onclick="removeItem(\'' + i.id + '\')">✕</button></li>';
+                '</span>' +
+                '<span class="line-price">₺<input type="number" class="item-price-input" value="' + i.price +
+                '" min="0" title="Bu satırın fiyatı — menü değişmez" onchange="updateItemPrice(\'' + i.id + '\', this.value)" /></span>' +
+                '<button class="del" onclick="removeItem(\'' + i.id + '\')">✕</button></li>';
             }).join("")
           : '<li class="empty">Sipariş yok</li>';
         return '<div class="table-card">' +
@@ -216,16 +234,18 @@
       currentTableId = tableId;
       document.getElementById("panel-title").textContent = tableName + " — Sipariş Ekle";
       var body = document.getElementById("panel-body");
-      body.innerHTML = menuCategories.map(function (cat, ci) {
+      var hint = '<p class="panel-hint">💡 ₺ kutusundaki fiyatı bu siparişe özel değiştirebilirsin — menü fiyatı değişmez.</p>';
+      body.innerHTML = hint + menuCategories.map(function (cat, ci) {
         var rows = (cat.items || []).map(function (item, ii) {
-          var id = "qty_" + ci + "_" + ii;
+          var qtyId = "qty_" + ci + "_" + ii;
+          var priceId = "price_" + ci + "_" + ii;
           return '<div class="menu-pick-row">' +
             '<span class="name">' + esc(item.name) + "</span>" +
-            '<span class="price">' + esc(item.price) + "</span>" +
             '<span class="add-controls">' +
-            '<input type="number" id="' + id + '" value="1" min="1" />' +
+            '<span class="pw">₺<input type="number" id="' + priceId + '" class="price-input" value="' + parsePrice(item.price) + '" min="0" title="Bu siparişe özel fiyat (menü değişmez)" /></span>' +
+            '<span class="pw">×<input type="number" id="' + qtyId + '" value="1" min="1" title="Adet" /></span>' +
             '<button class="btn-primary btn-small add-btn" data-name="' + esc(item.name) +
-              '" data-price="' + parsePrice(item.price) + '" data-qtyid="' + id + '">Ekle</button>' +
+              '" data-priceid="' + priceId + '" data-qtyid="' + qtyId + '">Ekle</button>' +
             "</span></div>";
         }).join("");
         return '<div class="category"><h4>' + esc(cat.title) + "</h4>" + rows + "</div>";
@@ -236,7 +256,7 @@
     document.getElementById("panel-body").addEventListener("click", function (e) {
       var btn = e.target.closest(".add-btn");
       if (!btn) return;
-      addItem(btn.dataset.name, Number(btn.dataset.price), btn.dataset.qtyid);
+      addItem(btn.dataset.name, btn.dataset.priceid, btn.dataset.qtyid);
     });
 
     function closePanel() {
@@ -244,7 +264,9 @@
       currentTableId = null;
     }
 
-    async function addItem(name, price, qtyInputId) {
+    async function addItem(name, priceInputId, qtyInputId) {
+      var price = parseInt(document.getElementById(priceInputId).value, 10);
+      if (isNaN(price) || price < 0) price = 0;
       var qty = parseInt(document.getElementById(qtyInputId).value, 10) || 1;
       try {
         var headers = await authHeaders();
@@ -255,6 +277,24 @@
         });
         if (!res.ok) throw new Error(await serverError(res, "Ürün eklenemedi"));
         showToast(name + " eklendi");
+        fetchTables();
+      } catch (e) {
+        showToast("Hata: " + e.message);
+      }
+    }
+
+    async function updateItemPrice(itemId, value) {
+      var price = parseInt(value, 10);
+      if (isNaN(price) || price < 0) price = 0;
+      try {
+        var headers = await authHeaders();
+        var res = await fetch(API + "order-items?id=" + encodeURIComponent(itemId), {
+          method: "PATCH",
+          headers: headers,
+          body: JSON.stringify({ price: price }),
+        });
+        if (!res.ok) throw new Error(await serverError(res, "Fiyat güncellenemedi"));
+        showToast("Fiyat güncellendi: ₺" + price);
         fetchTables();
       } catch (e) {
         showToast("Hata: " + e.message);
