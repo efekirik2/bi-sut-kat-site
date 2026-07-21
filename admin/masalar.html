@@ -5,141 +5,283 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bi Üst Kat — Masalar</title>
   <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" type="image/jpeg" href="../image/logo.jpg" />
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   <style>
     :root {
-      --bg: #ffffff;
-      --surface: #f7f3ee;
+      --bg: #eceff1;
+      --surface: #f6f8f9;
       --card: #ffffff;
       --accent: #e8952e;
       --accent-dark: #cf7f22;
-      --text: #2a2018;
-      --muted: #7a6a58;
-      --line: #e6ddd2;
-      --danger: #d9534f;
+      --text: #26303a;
+      --muted: #7c8a97;
+      --line: #dde3e7;
+      --danger: #e0564f;
+      --occupied: #e8952e;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.5;
+      background: var(--bg); color: var(--text); line-height: 1.5;
     }
-    header {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 1rem 1.5rem; border-bottom: 1px solid var(--line);
-      position: sticky; top: 0; background: rgba(255,255,255,.96); z-index: 10;
-    }
-    header h1 { font-size: 1.3rem; color: var(--accent); }
-    button {
-      font: inherit; cursor: pointer; border: none; border-radius: 8px;
-      padding: .55rem 1rem; font-weight: 600;
-    }
-    .btn-primary { background: var(--accent); color: #17110c; }
-    .btn-primary:hover { background: var(--accent-dark); }
-    .btn-outline { background: transparent; border: 1px solid var(--line); color: var(--text); }
-    .btn-danger { background: var(--danger); color: #fff; }
-    .btn-small { padding: .35rem .7rem; font-size: .85rem; }
+    button { font: inherit; cursor: pointer; }
+    /* Sayı kutularındaki yukarı/aşağı okları kaldır */
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
 
+    /* Üst bar */
+    .topbar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: .8rem 1.4rem; background: #fff; border-bottom: 1px solid var(--line);
+      position: sticky; top: 0; z-index: 10; box-shadow: 0 1px 6px rgba(0,0,0,.04);
+    }
+    .topbar .left { display: flex; align-items: center; gap: .6rem; }
+    .topbar .brand { display: flex; align-items: center; gap: .6rem; font-weight: 700; font-size: 1rem; }
+    .topbar .brand img { width: 34px; height: 34px; border-radius: 8px; object-fit: cover; }
+    .hamburger { display: none; background: none; border: none; font-size: 1.5rem; color: var(--text); cursor: pointer; padding: .1rem .3rem; line-height: 1; }
+
+    /* Yerleşim: sidebar + içerik */
+    .layout { display: flex; align-items: flex-start; }
+    .sidebar {
+      width: 235px; flex-shrink: 0; background: #2b333d; color: #c7d0d9;
+      position: sticky; top: 60px; height: calc(100vh - 60px);
+      display: flex; flex-direction: column; padding: .7rem 0; overflow-y: auto;
+    }
+    .nav-section { font-size: .66rem; letter-spacing: 1.2px; color: #808f9c; padding: 1rem 1.4rem .35rem; text-transform: uppercase; font-weight: 700; }
+    .nav-item {
+      display: flex; align-items: center; gap: .75rem; padding: .72rem 1.4rem;
+      color: #c7d0d9; text-decoration: none; font: inherit; font-weight: 500;
+      background: none; border: none; width: 100%; text-align: left; cursor: pointer;
+      transition: background .15s, color .15s, box-shadow .15s;
+    }
+    .nav-item .ic { width: 20px; text-align: center; font-size: 1.05rem; }
+    .nav-item:hover { background: rgba(255,255,255,.06); color: #fff; }
+    .nav-item.active { background: rgba(232,149,46,.15); color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); font-weight: 600; }
+    .nav-item.logout { color: #ff9b95; }
+    .nav-item.logout:hover { background: rgba(224,86,79,.22); color: #ffb0ab; }
+    .sidebar .spacer { flex: 1; }
+    .sidebar-foot { padding: .9rem 1.4rem .3rem; font-size: .72rem; color: #6d7b88; border-top: 1px solid rgba(255,255,255,.06); margin-top: .5rem; }
+    .sidebar-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 39; }
+    .main { flex: 1; min-width: 0; }
+
+    @media (max-width: 860px) {
+      .hamburger { display: block; }
+      .sidebar {
+        position: fixed; left: 0; top: 0; height: 100vh; z-index: 40;
+        transform: translateX(-100%); transition: transform .25s ease; box-shadow: 4px 0 24px rgba(0,0,0,.35);
+      }
+      .sidebar.open { transform: none; }
+      .sidebar-backdrop.show { display: block; }
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: .35rem; border: none; border-radius: 9px;
+      padding: .55rem 1rem; font-weight: 600; font: inherit; cursor: pointer; text-decoration: none;
+      transition: background .15s, border-color .15s, box-shadow .15s, transform .1s, color .15s, filter .15s;
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn-primary { background: var(--accent); color: #241606; box-shadow: 0 2px 8px rgba(232,149,46,.3); }
+    .btn-primary:hover { background: var(--accent-dark); }
+    .btn-outline { background: #fff; border: 1px solid var(--line); color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent-dark); box-shadow: 0 3px 10px rgba(0,0,0,.08); }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { filter: brightness(.94); }
+    .btn-small { padding: .4rem .8rem; font-size: .85rem; }
+
+    /* Giriş kapısı */
     #login-gate {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      min-height: 70vh; gap: 1rem; text-align: center; padding: 2rem;
+      min-height: 80vh; gap: 1rem; text-align: center; padding: 2rem;
     }
+    #login-gate h1 { color: var(--accent); }
     #login-gate p { color: var(--muted); }
 
-    #app { display: none; padding: 1.5rem; }
-    .grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.25rem;
-    }
-    .table-card {
-      background: var(--card); border: 1px solid var(--line); border-radius: 14px;
-      padding: 1.1rem 1.25rem; display: flex; flex-direction: column;
-      box-shadow: 0 2px 8px rgba(0,0,0,.07);
-    }
-    .table-card h3 { font-size: 1.1rem; margin-bottom: .5rem; }
-    .table-card .items { list-style: none; flex: 1; }
-    .table-card .item-row {
-      display: flex; justify-content: space-between; gap: .5rem; font-size: .88rem;
-      padding: .35rem 0; border-bottom: 1px dashed var(--line);
-    }
-    .table-card .item-row .info { color: var(--text); flex: 1; }
-    .table-card .item-row .info small { display: block; color: var(--muted); }
-    .table-card .item-row .line-price { display: inline-flex; align-items: center; gap: .1rem; color: var(--accent); font-weight: 700; font-size: .82rem; }
-    .table-card .item-price-input {
-      width: 3.6rem; background: var(--surface); border: 1px solid var(--line); color: var(--accent);
-      border-radius: 6px; padding: .15rem .25rem; text-align: right; font-weight: 700; font-size: .82rem;
-    }
-    .table-card .item-row .del {
-      background: none; color: var(--muted); padding: 0 .3rem; font-size: 1rem;
-    }
-    .table-card .item-row .del:hover { color: var(--danger); }
-    .table-card .empty { color: var(--muted); font-size: .85rem; padding: .5rem 0; }
-    .table-card .total { font-weight: 700; color: var(--accent); margin: .6rem 0; }
-    .table-card .actions { display: flex; gap: .5rem; }
+    /* İçerik */
+    #app { display: none; }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 1.6rem 1.4rem 3rem; }
+    .page-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
+    .page-head h1 { font-size: 2.1rem; font-weight: 800; letter-spacing: -.5px; }
+    .page-head .subtitle { color: var(--muted); margin-top: .15rem; font-size: 1rem; }
 
+    /* Özet istatistikler */
+    .summary { display: flex; gap: .8rem; margin: 1.4rem 0 .2rem; flex-wrap: wrap; }
+    .stat {
+      background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+      padding: .7rem 1.1rem; min-width: 120px; box-shadow: 0 1px 4px rgba(0,0,0,.04);
+    }
+    .stat-num { display: block; font-size: 1.5rem; font-weight: 800; }
+    .stat-num.accent { color: var(--accent); }
+    .stat-lbl { font-size: .78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; }
+
+    /* Filtreler */
+    .filters { display: flex; gap: .4rem; margin: 1.3rem 0 1.4rem; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 1rem; }
+    .filter-tab {
+      background: transparent; border: none; color: var(--muted); font-weight: 600;
+      padding: .5rem 1.05rem; border-radius: 999px; cursor: pointer;
+    }
+    .filter-tab:hover { color: var(--text); }
+    .filter-tab.active { background: var(--text); color: #fff; }
+
+    /* Masa kutucukları */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .9rem; }
+    .table-tile {
+      background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+      min-height: 108px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: .35rem; padding: 1rem .6rem; position: relative; overflow: hidden;
+      box-shadow: 0 1px 5px rgba(0,0,0,.05);
+      transition: transform .12s, box-shadow .12s, border-color .12s;
+    }
+    .table-tile:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,.12); border-color: var(--accent); }
+    .table-tile.occupied { border-color: rgba(232,149,46,.55); }
+    .table-tile.occupied::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-dark));
+    }
+    .tile-name { font-size: 1.2rem; font-weight: 700; color: var(--text); text-align: center; }
+    .tile-total { font-size: 1rem; font-weight: 800; color: var(--accent); }
+    .tile-empty { font-size: .7rem; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); }
+    .grid-empty { color: var(--muted); padding: 2rem; text-align: center; }
+
+    /* Modal */
     .overlay {
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6);
-      align-items: center; justify-content: center; z-index: 30; padding: 1rem;
+      display: none; position: fixed; inset: 0; background: rgba(20,28,35,.55);
+      align-items: center; justify-content: center; z-index: 60; padding: 1rem;
     }
     .overlay.open { display: flex; }
     .panel {
-      background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
-      max-width: 480px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 1.25rem 1.4rem;
+      background: var(--surface); border-radius: 16px; max-width: 500px; width: 100%;
+      max-height: 88vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,.35);
     }
-    .panel h2 { color: var(--accent); font-size: 1.15rem; margin-bottom: 1rem; }
-    .panel .category h4 { color: var(--muted); font-size: .8rem; text-transform: uppercase; margin: 1rem 0 .4rem; }
-    .menu-pick-row {
-      display: flex; justify-content: space-between; align-items: center; gap: .5rem;
-      padding: .5rem 0; border-bottom: 1px dashed var(--line);
+    .panel-head {
+      display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+      position: sticky; top: 0; z-index: 2; background: var(--surface);
+      padding: 1.1rem 1.4rem .9rem; border-bottom: 1px solid var(--line);
     }
+    .panel-head h2 { color: var(--text); font-size: 1.3rem; font-weight: 800; margin: 0; }
+    .panel-close {
+      background: none; border: none; color: var(--muted); font-size: 1.5rem; line-height: 1;
+      cursor: pointer; padding: .1rem .4rem; border-radius: 8px; flex-shrink: 0;
+      transition: color .15s, background .15s;
+    }
+    .panel-close:hover { color: var(--danger); background: rgba(0,0,0,.06); }
+
+    /* Modal — mevcut sipariş */
+    #panel-order { padding: 1.1rem 1.4rem .4rem; }
+    .ord-total-row {
+      display: flex; justify-content: space-between; align-items: center;
+      background: #fff; border: 1px solid var(--line); border-radius: 12px;
+      padding: .7rem 1rem; margin-bottom: .9rem;
+    }
+    .ord-total-row .lbl { color: var(--muted); font-size: .82rem; text-transform: uppercase; letter-spacing: .5px; font-weight: 600; }
+    .ord-total-amt { font-size: 1.5rem; font-weight: 800; color: var(--accent); }
+    .ord-list { list-style: none; margin-bottom: .9rem; }
+    .ord-row { display: flex; align-items: center; gap: .5rem; padding: .5rem 0; border-bottom: 1px dashed var(--line); font-size: .9rem; }
+    .ord-row:last-child { border-bottom: none; }
+    .ord-info { flex: 1; }
+    .ord-info small { display: block; color: var(--muted); }
+    .ord-price { display: inline-flex; align-items: center; gap: .1rem; color: var(--accent); font-weight: 700; font-size: .85rem; }
+    .item-price-input {
+      width: 3.8rem; background: var(--surface); border: 1px solid var(--line); color: var(--accent);
+      border-radius: 6px; padding: .18rem .3rem; text-align: right; font-weight: 700; font-size: .85rem;
+    }
+    .ord-del { background: none; border: none; color: var(--muted); font-size: 1rem; cursor: pointer; padding: 0 .3rem; }
+    .ord-del:hover { color: var(--danger); }
+    .ord-empty { color: var(--muted); font-style: italic; padding: .6rem 0; }
+    .ord-actions { display: flex; gap: .5rem; flex-wrap: wrap; padding-bottom: .9rem; border-bottom: 1px solid var(--line); }
+
+    /* Modal — ürün ekle */
+    .add-title { padding: 1rem 1.4rem .2rem; font-size: .82rem; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); font-weight: 700; }
+    #panel-body { padding: 0 1.4rem 1.3rem; }
+    .panel-hint {
+      color: var(--muted); font-size: .82rem; margin: .3rem 0 .8rem;
+      background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: .5rem .7rem;
+    }
+    .category h4 { color: var(--muted); font-size: .8rem; text-transform: uppercase; margin: 1rem 0 .4rem; }
+    .menu-pick-row { display: flex; justify-content: space-between; align-items: center; gap: .5rem; padding: .5rem 0; border-bottom: 1px dashed var(--line); }
     .menu-pick-row .name { font-size: .92rem; }
-    .menu-pick-row .price { color: var(--accent); font-size: .85rem; white-space: nowrap; }
     .menu-pick-row .add-controls { display: flex; align-items: center; gap: .4rem; }
     .menu-pick-row input[type="number"] {
-      width: 3rem; background: var(--card); border: 1px solid var(--line); color: var(--text);
+      width: 3rem; background: #fff; border: 1px solid var(--line); color: var(--text);
       border-radius: 6px; padding: .25rem; text-align: center;
     }
     .menu-pick-row .price-input { width: 4.4rem; color: var(--accent); font-weight: 700; }
     .menu-pick-row .pw { display: inline-flex; align-items: center; gap: .15rem; color: var(--muted); font-size: .8rem; }
-    .panel-hint {
-      color: var(--muted); font-size: .82rem; margin-bottom: .8rem;
-      background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: .5rem .7rem;
-    }
-    .panel .close-row { display: flex; justify-content: flex-end; margin-top: 1rem; }
+
     #toast {
       position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
-      background: var(--card); border: 1px solid var(--line); color: var(--text);
-      padding: .7rem 1.2rem; border-radius: 8px; font-size: .9rem; z-index: 50;
-      display: none;
+      background: var(--text); color: #fff; padding: .7rem 1.2rem; border-radius: 10px;
+      font-size: .9rem; z-index: 70; display: none; box-shadow: 0 8px 24px rgba(0,0,0,.25);
+    }
+
+    @media (max-width: 520px) {
+      .page-head h1 { font-size: 1.7rem; }
+      .grid { grid-template-columns: repeat(auto-fill, minmax(46%, 1fr)); }
     }
   </style>
 </head>
 <body>
   <div id="login-gate">
-    <h1 style="color:var(--accent)">Bi Üst Kat — Masalar</h1>
+    <h1>Bi Üst Kat — Masalar</h1>
     <p>Bu sayfa sadece personel içindir. Devam etmek için giriş yapın.</p>
-    <button class="btn-primary" onclick="window.netlifyIdentity.open()">Giriş Yap</button>
+    <button class="btn btn-primary" onclick="window.netlifyIdentity.open()">Giriş Yap</button>
   </div>
 
   <div id="app">
-    <header>
-      <h1>Masalar</h1>
-      <div style="display:flex; gap:.6rem;">
-        <a class="btn-outline" href="/personel.html" style="text-decoration:none; display:inline-flex; align-items:center;">← Panel</a>
-        <button class="btn-outline" onclick="addTable()">+ Masa Ekle</button>
-        <button class="btn-outline" onclick="window.netlifyIdentity.logout()">Çıkış</button>
+    <div class="topbar">
+      <div class="left">
+        <button class="hamburger" onclick="toggleSidebar()" aria-label="Menü">☰</button>
+        <div class="brand"><img src="../image/logo.jpg" alt="" /> Bi Üst Kat Gümüşlük</div>
       </div>
-    </header>
-    <div class="grid" id="grid"></div>
+    </div>
+
+    <div class="layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="nav-section">Restoran</div>
+        <a class="nav-item active" href="/admin/masalar.html"><span class="ic">🍽️</span> Masalar</a>
+        <a class="nav-item" href="/admin/"><span class="ic">📝</span> Menü Düzenle</a>
+        <div class="nav-section">Diğer</div>
+        <a class="nav-item" href="/personel.html"><span class="ic">🧭</span> Personel Paneli</a>
+        <a class="nav-item" href="/" target="_blank" rel="noopener"><span class="ic">🌐</span> Siteyi Gör</a>
+        <div class="spacer"></div>
+        <button class="nav-item logout" onclick="logout()"><span class="ic">⎋</span> Çıkış</button>
+        <div class="sidebar-foot">Bi Üst Kat • Masa Yönetimi</div>
+      </aside>
+      <div class="sidebar-backdrop" id="sb-backdrop" onclick="toggleSidebar()"></div>
+      <main class="main">
+    <div class="wrap">
+      <div class="page-head">
+        <div>
+          <h1>Masalar</h1>
+          <p class="subtitle">Sipariş almak için masaya tıkla</p>
+        </div>
+        <button class="btn btn-primary" onclick="addTable()">+ Masa Ekle</button>
+      </div>
+
+      <div class="summary" id="summary"></div>
+
+      <div class="filters">
+        <button class="filter-tab active" data-filter="all" onclick="setFilter('all', this)">Tümü</button>
+        <button class="filter-tab" data-filter="occupied" onclick="setFilter('occupied', this)">Dolu</button>
+        <button class="filter-tab" data-filter="empty" onclick="setFilter('empty', this)">Boş</button>
+      </div>
+
+      <div class="grid" id="grid"></div>
+    </div>
+      </main>
+    </div>
   </div>
 
   <div class="overlay" id="overlay">
     <div class="panel">
-      <h2 id="panel-title">Masa</h2>
-      <div id="panel-body"></div>
-      <div class="close-row">
-        <button class="btn-outline" onclick="closePanel()">Kapat</button>
+      <div class="panel-head">
+        <h2 id="panel-title">Masa</h2>
+        <button class="panel-close" onclick="closePanel()" title="Kapat" aria-label="Kapat">✕</button>
       </div>
+      <div id="panel-order"></div>
+      <div class="add-title">Ürün Ekle</div>
+      <div id="panel-body"></div>
     </div>
   </div>
 
@@ -148,34 +290,35 @@
   <script>
     var API = "/.netlify/functions/";
     var menuCategories = [];
+    var lastTables = [];
     var currentTableId = null;
+    var activeFilter = "all";
     var pollTimer = null;
-    // Sadece yerel geliştirmede (dev-server.js) Netlify Identity atlanır.
     var LOCAL = location.hostname === "localhost" || location.hostname === "127.0.0.1";
 
     function showToast(msg) {
       var t = document.getElementById("toast");
-      t.textContent = msg;
-      t.style.display = "block";
+      t.textContent = msg; t.style.display = "block";
       setTimeout(function () { t.style.display = "none"; }, 2500);
     }
-
     function esc(s) {
       return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
         return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
       });
     }
-
     function parsePrice(str) {
       var digits = String(str).replace(/[^\d]/g, "");
       return digits ? parseInt(digits, 10) : 0;
     }
-
     async function authHeaders() {
       if (LOCAL) return { "Content-Type": "application/json" };
       var user = window.netlifyIdentity.currentUser();
       var token = await user.jwt();
       return { Authorization: "Bearer " + token, "Content-Type": "application/json" };
+    }
+    async function serverError(res, fallback) {
+      try { var d = await res.json(); return (d && d.error) ? d.error : fallback + " (" + res.status + ")"; }
+      catch (e) { return fallback + " (" + res.status + ")"; }
     }
 
     async function loadMenu() {
@@ -183,9 +326,7 @@
         var res = await fetch("/content/menu.json", { cache: "no-store" });
         var data = await res.json();
         menuCategories = data.categories || [];
-      } catch (e) {
-        menuCategories = [];
-      }
+      } catch (e) { menuCategories = []; }
     }
 
     async function fetchTables() {
@@ -193,64 +334,114 @@
         var headers = await authHeaders();
         var res = await fetch(API + "tables", { headers: headers });
         if (!res.ok) throw new Error(await serverError(res, "Masalar yüklenemedi"));
-        var tables = await res.json();
-        renderGrid(tables);
-      } catch (e) {
-        console.error(e);
-        showToast("Hata: " + e.message);
-      }
+        lastTables = await res.json();
+        renderGrid(lastTables);
+        if (document.getElementById("overlay").classList.contains("open")) refreshOrderPanel();
+      } catch (e) { console.error(e); showToast("Hata: " + e.message); }
     }
 
     function renderGrid(tables) {
+      var openCount = tables.filter(function (t) { return !!t.order_id; }).length;
+      var openSum = tables.reduce(function (s, t) { return s + (t.order_id ? (Number(t.total) || 0) : 0); }, 0);
+      document.getElementById("summary").innerHTML =
+        '<div class="stat"><span class="stat-num">' + openCount + '</span><span class="stat-lbl">Açık masa</span></div>' +
+        '<div class="stat"><span class="stat-num accent">₺' + openSum + '</span><span class="stat-lbl">Masalarda açık</span></div>' +
+        '<div class="stat"><span class="stat-num">' + tables.length + '</span><span class="stat-lbl">Toplam masa</span></div>';
+
+      var list = tables.filter(function (t) {
+        if (activeFilter === "occupied") return !!t.order_id;
+        if (activeFilter === "empty") return !t.order_id;
+        return true;
+      });
       var grid = document.getElementById("grid");
-      // Kullanıcı bir fiyat kutusunu düzenliyorsa yeniden çizme (yazdığı kaybolmasın)
-      var ae = document.activeElement;
-      if (ae && ae.classList && ae.classList.contains("item-price-input")) return;
-      grid.innerHTML = tables.map(function (t) {
-        var itemsHtml = (t.items || []).length
-          ? t.items.map(function (i) {
-              return '<li class="item-row"><span class="info">' + i.quantity + "x " + esc(i.name) +
-                (i.note ? "<small>" + esc(i.note) + "</small>" : "") +
-                '</span>' +
-                '<span class="line-price">₺<input type="number" class="item-price-input" value="' + i.price +
-                '" min="0" title="Bu satırın fiyatı — menü değişmez" onchange="updateItemPrice(\'' + i.id + '\', this.value)" /></span>' +
-                '<button class="del" onclick="removeItem(\'' + i.id + '\')">✕</button></li>';
-            }).join("")
-          : '<li class="empty">Sipariş yok</li>';
-        return '<div class="table-card">' +
-          "<h3>" + esc(t.name) + "</h3>" +
-          '<ul class="items">' + itemsHtml + "</ul>" +
-          '<div class="total">Toplam: ₺' + t.total + "</div>" +
-          '<div class="actions">' +
-          '<button class="btn-primary btn-small" onclick="openPanel(\'' + t.id + '\', \'' + esc(t.name).replace(/'/g, "\\'") + '\')">Sipariş Ekle</button>' +
-          (t.order_id ? '<button class="btn-danger btn-small" onclick="closeBill(\'' + t.id + '\')">Hesabı Kapat</button>' : "") +
-          '<button class="btn-outline btn-small" onclick="deleteTable(\'' + t.id + '\', \'' + esc(t.name).replace(/'/g, "\\'") + '\')">Sil</button>' +
-          "</div>" +
-          "</div>";
+      if (!list.length) { grid.innerHTML = '<p class="grid-empty">Bu filtrede masa yok.</p>'; return; }
+      grid.innerHTML = list.map(function (t) {
+        var occupied = !!t.order_id;
+        var safeName = esc(t.name).replace(/'/g, "\\'");
+        return '<button class="table-tile' + (occupied ? " occupied" : "") + '" onclick="openTable(\'' + t.id + "', '" + safeName + '\')">' +
+          '<span class="tile-name">' + esc(t.name) + "</span>" +
+          (occupied ? '<span class="tile-total">₺' + t.total + "</span>" : '<span class="tile-empty">Boş</span>') +
+          "</button>";
       }).join("");
     }
 
-    function openPanel(tableId, tableName) {
-      currentTableId = tableId;
-      document.getElementById("panel-title").textContent = tableName + " — Sipariş Ekle";
-      var body = document.getElementById("panel-body");
+    function setFilter(f, btn) {
+      activeFilter = f;
+      var tabs = document.querySelectorAll(".filter-tab");
+      for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove("active");
+      btn.classList.add("active");
+      renderGrid(lastTables);
+    }
+
+    function renderOrderSection(t) {
+      var occupied = !!(t && t.order_id);
+      var items = (t && t.items) || [];
+      var rows = items.length
+        ? items.map(function (i) {
+            return '<li class="ord-row"><span class="ord-info">' + i.quantity + "x " + esc(i.name) +
+              (i.note ? "<small>" + esc(i.note) + "</small>" : "") + "</span>" +
+              '<span class="ord-price">₺<input type="number" class="item-price-input" value="' + i.price +
+              '" min="0" title="Bu satırın fiyatı — menü değişmez" onchange="updateItemPrice(\'' + i.id + '\', this.value)" /></span>' +
+              '<button class="ord-del" onclick="removeItem(\'' + i.id + '\')" title="Sil">✕</button></li>';
+          }).join("")
+        : '<li class="ord-empty">Henüz sipariş yok</li>';
+      var total = (t && t.total) || 0;
+      var safeName = t ? esc(t.name).replace(/'/g, "\\'") : "";
+      return '<div class="ord-total-row"><span class="lbl">Toplam</span><span class="ord-total-amt">₺' + total + "</span></div>" +
+        '<ul class="ord-list">' + rows + "</ul>" +
+        '<div class="ord-actions">' +
+        (occupied ? '<button class="btn btn-danger btn-small" onclick="closeBill(\'' + t.id + '\')">Hesabı Kapat</button>' : "") +
+        '<button class="btn btn-outline btn-small" onclick="deleteTable(\'' + t.id + "', '" + safeName + '\')">Masayı Sil</button>' +
+        "</div>";
+    }
+
+    function refreshOrderPanel() {
+      if (!currentTableId) return;
+      var ae = document.activeElement;
+      if (ae && ae.classList && ae.classList.contains("item-price-input")) return;
+      var t = lastTables.find(function (x) { return x.id === currentTableId; });
+      document.getElementById("panel-order").innerHTML = renderOrderSection(t);
+    }
+
+    function renderMenu() {
       var hint = '<p class="panel-hint">💡 ₺ kutusundaki fiyatı bu siparişe özel değiştirebilirsin — menü fiyatı değişmez.</p>';
-      body.innerHTML = hint + menuCategories.map(function (cat, ci) {
+      document.getElementById("panel-body").innerHTML = hint + menuCategories.map(function (cat, ci) {
         var rows = (cat.items || []).map(function (item, ii) {
-          var qtyId = "qty_" + ci + "_" + ii;
-          var priceId = "price_" + ci + "_" + ii;
+          var qtyId = "qty_" + ci + "_" + ii, priceId = "price_" + ci + "_" + ii;
           return '<div class="menu-pick-row">' +
             '<span class="name">' + esc(item.name) + "</span>" +
             '<span class="add-controls">' +
-            '<span class="pw">₺<input type="number" id="' + priceId + '" class="price-input" value="' + parsePrice(item.price) + '" min="0" title="Bu siparişe özel fiyat (menü değişmez)" /></span>' +
-            '<span class="pw">×<input type="number" id="' + qtyId + '" value="1" min="1" title="Adet" /></span>' +
-            '<button class="btn-primary btn-small add-btn" data-name="' + esc(item.name) +
-              '" data-priceid="' + priceId + '" data-qtyid="' + qtyId + '">Ekle</button>' +
+            '<span class="pw">₺<input type="number" id="' + priceId + '" class="price-input" value="' + parsePrice(item.price) + '" min="0" /></span>' +
+            '<span class="pw">×<input type="number" id="' + qtyId + '" value="1" min="1" /></span>' +
+            '<button class="btn btn-primary btn-small add-btn" data-name="' + esc(item.name) +
+            '" data-priceid="' + priceId + '" data-qtyid="' + qtyId + '">Ekle</button>' +
             "</span></div>";
         }).join("");
         return '<div class="category"><h4>' + esc(cat.title) + "</h4>" + rows + "</div>";
       }).join("");
+    }
+
+    function openTable(tableId, tableName) {
+      currentTableId = tableId;
+      document.getElementById("panel-title").textContent = tableName;
+      refreshOrderPanel();
+      renderMenu();
       document.getElementById("overlay").classList.add("open");
+    }
+
+    function closePanel() {
+      document.getElementById("overlay").classList.remove("open");
+      currentTableId = null;
+    }
+
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("open");
+      document.getElementById("sb-backdrop").classList.toggle("show");
+    }
+
+    function logout() {
+      if (LOCAL) { showToast("Yerelde çıkış yok"); return; }
+      window.netlifyIdentity.logout();
     }
 
     document.getElementById("panel-body").addEventListener("click", function (e) {
@@ -258,11 +449,9 @@
       if (!btn) return;
       addItem(btn.dataset.name, btn.dataset.priceid, btn.dataset.qtyid);
     });
-
-    function closePanel() {
-      document.getElementById("overlay").classList.remove("open");
-      currentTableId = null;
-    }
+    document.getElementById("overlay").addEventListener("click", function (e) {
+      if (e.target === this) closePanel();
+    });
 
     async function addItem(name, priceInputId, qtyInputId) {
       var price = parseInt(document.getElementById(priceInputId).value, 10);
@@ -271,16 +460,13 @@
       try {
         var headers = await authHeaders();
         var res = await fetch(API + "order-items", {
-          method: "POST",
-          headers: headers,
+          method: "POST", headers: headers,
           body: JSON.stringify({ table_id: currentTableId, name: name, price: price, quantity: qty }),
         });
         if (!res.ok) throw new Error(await serverError(res, "Ürün eklenemedi"));
         showToast(name + " eklendi");
         fetchTables();
-      } catch (e) {
-        showToast("Hata: " + e.message);
-      }
+      } catch (e) { showToast("Hata: " + e.message); }
     }
 
     async function updateItemPrice(itemId, value) {
@@ -289,31 +475,22 @@
       try {
         var headers = await authHeaders();
         var res = await fetch(API + "order-items?id=" + encodeURIComponent(itemId), {
-          method: "PATCH",
-          headers: headers,
-          body: JSON.stringify({ price: price }),
+          method: "PATCH", headers: headers, body: JSON.stringify({ price: price }),
         });
         if (!res.ok) throw new Error(await serverError(res, "Fiyat güncellenemedi"));
         showToast("Fiyat güncellendi: ₺" + price);
         fetchTables();
-      } catch (e) {
-        showToast("Hata: " + e.message);
-      }
+      } catch (e) { showToast("Hata: " + e.message); }
     }
 
     async function removeItem(itemId) {
       if (!confirm("Bu satırı silmek istediğinize emin misiniz?")) return;
       try {
         var headers = await authHeaders();
-        var res = await fetch(API + "order-items?id=" + encodeURIComponent(itemId), {
-          method: "DELETE",
-          headers: headers,
-        });
+        var res = await fetch(API + "order-items?id=" + encodeURIComponent(itemId), { method: "DELETE", headers: headers });
         if (!res.ok) throw new Error(await serverError(res, "Satır silinemedi"));
         fetchTables();
-      } catch (e) {
-        showToast("Hata: " + e.message);
-      }
+      } catch (e) { showToast("Hata: " + e.message); }
     }
 
     async function closeBill(tableId) {
@@ -321,59 +498,39 @@
       try {
         var headers = await authHeaders();
         var res = await fetch(API + "order-close", {
-          method: "POST",
-          headers: headers,
-          body: JSON.stringify({ table_id: tableId }),
+          method: "POST", headers: headers, body: JSON.stringify({ table_id: tableId }),
         });
         if (!res.ok) throw new Error(await serverError(res, "Hesap kapatılamadı"));
         var data = await res.json();
         showToast("Hesap kapatıldı: ₺" + data.total);
+        closePanel();
         fetchTables();
-      } catch (e) {
-        showToast("Hata: " + e.message);
-      }
-    }
-
-    async function serverError(res, fallback) {
-      try {
-        var data = await res.json();
-        return (data && data.error) ? data.error : fallback + " (" + res.status + ")";
-      } catch (e) {
-        return fallback + " (" + res.status + ")";
-      }
+      } catch (e) { showToast("Hata: " + e.message); }
     }
 
     async function deleteTable(tableId, tableName) {
       if (!confirm('"' + tableName + '" masasını tamamen silmek istediğinize emin misiniz?\nAçık sipariş varsa o da silinir.')) return;
       try {
         var headers = await authHeaders();
-        var res = await fetch(API + "tables?id=" + encodeURIComponent(tableId), {
-          method: "DELETE",
-          headers: headers,
-        });
+        var res = await fetch(API + "tables?id=" + encodeURIComponent(tableId), { method: "DELETE", headers: headers });
         if (!res.ok) throw new Error(await serverError(res, "Masa silinemedi"));
         showToast(tableName + " silindi");
+        closePanel();
         fetchTables();
-      } catch (e) {
-        showToast("Hata: " + e.message);
-      }
+      } catch (e) { showToast("Hata: " + e.message); }
     }
 
     async function addTable() {
-      var name = prompt("Yeni masa adı (örn. Masa 7):");
+      var name = prompt("Yeni masa adı (örn. A1, Teras 2):");
       if (!name || !name.trim()) return;
       try {
         var headers = await authHeaders();
         var res = await fetch(API + "tables", {
-          method: "POST",
-          headers: headers,
-          body: JSON.stringify({ name: name.trim() }),
+          method: "POST", headers: headers, body: JSON.stringify({ name: name.trim() }),
         });
         if (!res.ok) throw new Error(await serverError(res, "Masa eklenemedi"));
         fetchTables();
-      } catch (e) {
-        showToast("Hata: " + e.message);
-      }
+      } catch (e) { showToast("Hata: " + e.message); }
     }
 
     function startApp() {
@@ -385,16 +542,10 @@
     }
 
     if (LOCAL) {
-      // Yerel geliştirme: Identity yok, doğrudan uygulamayı başlat.
       startApp();
     } else {
-      window.netlifyIdentity.on("init", function (user) {
-        if (user) startApp();
-      });
-      window.netlifyIdentity.on("login", function () {
-        window.netlifyIdentity.close();
-        startApp();
-      });
+      window.netlifyIdentity.on("init", function (user) { if (user) startApp(); });
+      window.netlifyIdentity.on("login", function () { window.netlifyIdentity.close(); startApp(); });
       window.netlifyIdentity.on("logout", function () {
         document.getElementById("app").style.display = "none";
         document.getElementById("login-gate").style.display = "flex";

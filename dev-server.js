@@ -73,7 +73,10 @@ const server = http.createServer(async (req, res) => {
   }
   if (!fs.existsSync(filePath)) { res.writeHead(404); return res.end("Bulunamadı: " + pathname); }
   const ext = path.extname(filePath).toLowerCase();
-  res.writeHead(200, { "Content-Type": MIME[ext] || "application/octet-stream" });
+  res.writeHead(200, {
+    "Content-Type": MIME[ext] || "application/octet-stream",
+    "Cache-Control": "no-store, must-revalidate",
+  });
   fs.createReadStream(filePath).pipe(res);
 });
 
