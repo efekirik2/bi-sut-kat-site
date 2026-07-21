@@ -1,5 +1,10 @@
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+// URL sonundaki fazladan '/rest/v1' veya '/' varsa temizle; anahtardaki
+// boşluk/satır sonlarını at (yanlış kopyalamalara karşı toleranslı olsun).
+const SUPABASE_URL = (process.env.SUPABASE_URL || "")
+  .trim()
+  .replace(/\/+$/, "")
+  .replace(/\/rest\/v1$/, "");
+const SERVICE_KEY = (process.env.SUPABASE_SERVICE_ROLE_KEY || "").trim();
 
 async function sb(path, options = {}) {
   const res = await fetch(SUPABASE_URL + "/rest/v1" + path, {
