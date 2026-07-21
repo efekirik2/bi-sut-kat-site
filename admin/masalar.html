@@ -205,6 +205,7 @@
           '<div class="actions">' +
           '<button class="btn-primary btn-small" onclick="openPanel(\'' + t.id + '\', \'' + esc(t.name).replace(/'/g, "\\'") + '\')">Sipariş Ekle</button>' +
           (t.order_id ? '<button class="btn-danger btn-small" onclick="closeBill(\'' + t.id + '\')">Hesabı Kapat</button>' : "") +
+          '<button class="btn-outline btn-small" onclick="deleteTable(\'' + t.id + '\', \'' + esc(t.name).replace(/'/g, "\\'") + '\')">Sil</button>' +
           "</div>" +
           "</div>";
       }).join("");
@@ -298,6 +299,22 @@
         return (data && data.error) ? data.error : fallback + " (" + res.status + ")";
       } catch (e) {
         return fallback + " (" + res.status + ")";
+      }
+    }
+
+    async function deleteTable(tableId, tableName) {
+      if (!confirm('"' + tableName + '" masasını tamamen silmek istediğinize emin misiniz?\nAçık sipariş varsa o da silinir.')) return;
+      try {
+        var headers = await authHeaders();
+        var res = await fetch(API + "tables?id=" + encodeURIComponent(tableId), {
+          method: "DELETE",
+          headers: headers,
+        });
+        if (!res.ok) throw new Error(await serverError(res, "Masa silinemedi"));
+        showToast(tableName + " silindi");
+        fetchTables();
+      } catch (e) {
+        showToast("Hata: " + e.message);
       }
     }
 

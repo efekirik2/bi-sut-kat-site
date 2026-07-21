@@ -35,5 +35,13 @@ exports.handler = wrap(async (event, context) => {
     return json(201, created);
   }
 
+  if (event.httpMethod === "DELETE") {
+    const id = event.queryStringParameters && event.queryStringParameters.id;
+    if (!id) return json(400, { error: "id gerekli." });
+    // Masa silinince açık/kapalı siparişleri ve satırları cascade ile gider.
+    await sb("/tables?id=eq." + id, { method: "DELETE" });
+    return json(200, { ok: true });
+  }
+
   return json(405, { error: "Yöntem desteklenmiyor." });
 });
