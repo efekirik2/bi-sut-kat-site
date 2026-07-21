@@ -1,6 +1,6 @@
-const { sb, requireUser, json } = require("./lib/supabase");
+const { sb, requireUser, json, wrap } = require("./lib/supabase");
 
-exports.handler = async (event, context) => {
+exports.handler = wrap(async (event, context) => {
   const user = requireUser(context);
   if (!user) return json(401, { error: "Giriş yapmanız gerekiyor." });
   if (event.httpMethod !== "POST") return json(405, { error: "Yöntem desteklenmiyor." });
@@ -28,4 +28,4 @@ exports.handler = async (event, context) => {
   });
 
   return json(200, { ok: true, total });
-};
+});

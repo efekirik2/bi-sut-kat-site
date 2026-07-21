@@ -32,4 +32,22 @@ function json(statusCode, data) {
   };
 }
 
-module.exports = { sb, requireUser, json };
+function checkEnv() {
+  if (!SUPABASE_URL) return "SUPABASE_URL ortam değişkeni tanımlı değil.";
+  if (!SERVICE_KEY) return "SUPABASE_SERVICE_ROLE_KEY ortam değişkeni tanımlı değil.";
+  return null;
+}
+
+function wrap(handler) {
+  return async (event, context) => {
+    const envError = checkEnv();
+    if (envError) return json(500, { error: envError });
+    try {
+      return await handler(event, context);
+    } catch (err) {
+      return json(500, { error: String((err && err.message) || err) });
+    }
+  };
+}
+
+module.exports = { sb, requireUser, json, wrap };

@@ -176,11 +176,12 @@
       try {
         var headers = await authHeaders();
         var res = await fetch(API + "tables", { headers: headers });
-        if (!res.ok) throw new Error("tables fetch failed");
+        if (!res.ok) throw new Error(await serverError(res, "Masalar yüklenemedi"));
         var tables = await res.json();
         renderGrid(tables);
       } catch (e) {
         console.error(e);
+        showToast("Hata: " + e.message);
       }
     }
 
@@ -247,11 +248,11 @@
           headers: headers,
           body: JSON.stringify({ table_id: currentTableId, name: name, price: price, quantity: qty }),
         });
-        if (!res.ok) throw new Error("add item failed");
+        if (!res.ok) throw new Error(await serverError(res, "Ürün eklenemedi"));
         showToast(name + " eklendi");
         fetchTables();
       } catch (e) {
-        showToast("Hata: ürün eklenemedi");
+        showToast("Hata: " + e.message);
       }
     }
 
@@ -263,10 +264,10 @@
           method: "DELETE",
           headers: headers,
         });
-        if (!res.ok) throw new Error("delete failed");
+        if (!res.ok) throw new Error(await serverError(res, "Satır silinemedi"));
         fetchTables();
       } catch (e) {
-        showToast("Hata: satır silinemedi");
+        showToast("Hata: " + e.message);
       }
     }
 
@@ -279,12 +280,21 @@
           headers: headers,
           body: JSON.stringify({ table_id: tableId }),
         });
-        if (!res.ok) throw new Error("close failed");
+        if (!res.ok) throw new Error(await serverError(res, "Hesap kapatılamadı"));
         var data = await res.json();
         showToast("Hesap kapatıldı: ₺" + data.total);
         fetchTables();
       } catch (e) {
-        showToast("Hata: hesap kapatılamadı");
+        showToast("Hata: " + e.message);
+      }
+    }
+
+    async function serverError(res, fallback) {
+      try {
+        var data = await res.json();
+        return (data && data.error) ? data.error : fallback + " (" + res.status + ")";
+      } catch (e) {
+        return fallback + " (" + res.status + ")";
       }
     }
 
@@ -298,10 +308,10 @@
           headers: headers,
           body: JSON.stringify({ name: name.trim() }),
         });
-        if (!res.ok) throw new Error("add table failed");
+        if (!res.ok) throw new Error(await serverError(res, "Masa eklenemedi"));
         fetchTables();
       } catch (e) {
-        showToast("Hata: masa eklenemedi");
+        showToast("Hata: " + e.message);
       }
     }
 

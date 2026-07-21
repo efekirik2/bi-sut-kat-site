@@ -1,4 +1,4 @@
-const { sb, requireUser, json } = require("./lib/supabase");
+const { sb, requireUser, json, wrap } = require("./lib/supabase");
 
 async function getOrCreateOpenOrder(tableId) {
   const existing = await sb("/orders?table_id=eq." + tableId + "&status=eq.open&select=id");
@@ -11,7 +11,7 @@ async function getOrCreateOpenOrder(tableId) {
   return created.id;
 }
 
-exports.handler = async (event, context) => {
+exports.handler = wrap(async (event, context) => {
   const user = requireUser(context);
   if (!user) return json(401, { error: "Giriş yapmanız gerekiyor." });
 
@@ -46,4 +46,4 @@ exports.handler = async (event, context) => {
   }
 
   return json(405, { error: "Yöntem desteklenmiyor." });
-};
+});
