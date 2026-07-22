@@ -2,6 +2,15 @@ backend:
   name: git-gateway
   branch: main
 
+# Yerel geliştirme: localhost'ta menüyü girişsiz düzenlemeyi sağlar
+# (npx decap-server ile birlikte çalışır). Canlı sitede etkisizdir.
+local_backend: true
+
+# Markalama: giriş ekranı logosu ve siteye dönüş linki
+site_url: https://biustkatgumusluk.netlify.app
+display_url: https://biustkatgumusluk.netlify.app
+logo_url: /image/logo.jpg
+
 # Yüklenen fotoğraflar bu klasöre kaydedilir
 media_folder: "image"
 public_folder: "image"

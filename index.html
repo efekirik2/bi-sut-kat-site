@@ -64,25 +64,39 @@
 
   <!-- Yönetim paneli girişi (Netlify Identity) -->
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
+  <!-- Zarif tipografi -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #17110c;
-      --surface: #201812;
-      --card: #2a2018;
+      --bg: #140f0a;
+      --surface: #1d1610;
+      --card: #241c15;
       --accent: #e8952e;
       --accent-dark: #cf7f22;
+      --gold: #c9a15a;
       --text: #f6ede2;
-      --muted: #b6a591;
-      --line: #3a2e24;
+      --muted: #b0a08d;
+      --line: #352a20;
+      --serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+      --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html { scroll-behavior: smooth; }
     body {
-      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-family: var(--sans);
       background: var(--bg);
       color: var(--text);
-      line-height: 1.6;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
     }
+    h1, h2, h3, .brand .name { font-family: var(--serif); font-weight: 600; }
+
+    /* Zarif giriş animasyonu */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s ease, transform .8s ease; }
+    .reveal.in { opacity: 1; transform: none; }
 
     /* Header */
     header {
@@ -103,7 +117,7 @@
       object-fit: cover; border-radius: 50%;
       background: #fff; padding: 2px;
     }
-    .brand .name { font-weight: 800; font-size: 1.15rem; letter-spacing: .5px; color: var(--accent); }
+    .brand .name { font-size: 1.4rem; letter-spacing: .5px; color: var(--gold); }
     nav a {
       color: var(--muted);
       text-decoration: none;
@@ -124,39 +138,37 @@
       text-align: center;
       padding: 4rem 1.5rem;
       background:
-        linear-gradient(rgba(23,17,12,.35), rgba(23,17,12,.85)),
+        linear-gradient(rgba(20,15,10,.4), rgba(20,15,10,.92)),
         url("image/WhatsApp%20Image%202026-07-20%20at%2010.24.21.jpeg") center/cover no-repeat;
     }
     .hero img.logo {
-      width: 150px; height: 150px; border-radius: 50%;
-      object-fit: cover; background: #fff; padding: 6px;
-      box-shadow: 0 10px 40px rgba(0,0,0,.5);
-      margin-bottom: 1.5rem;
+      width: 138px; height: 138px; border-radius: 50%;
+      object-fit: cover; background: #fff; padding: 5px;
+      box-shadow: 0 12px 44px rgba(0,0,0,.55), 0 0 0 1px rgba(201,161,90,.55), 0 0 0 9px rgba(201,161,90,.1);
+      margin-bottom: 1.7rem;
     }
-    .hero .tag { color: var(--accent); font-weight: 600; letter-spacing: 3px; font-size: .8rem; text-transform: uppercase; }
-    .hero h1 { font-size: 3rem; margin: .5rem 0 .75rem; text-shadow: 0 2px 20px rgba(0,0,0,.6); }
-    .hero p { color: #eadfd0; font-size: 1.15rem; max-width: 540px; margin: 0 auto 2rem; text-shadow: 0 1px 10px rgba(0,0,0,.6); }
+    .hero .tag { font-family: var(--sans); color: var(--gold); font-weight: 600; letter-spacing: 4px; font-size: .76rem; text-transform: uppercase; }
+    .hero h1 { font-size: 4rem; font-weight: 600; line-height: 1.04; margin: .8rem 0 .9rem; text-shadow: 0 2px 26px rgba(0,0,0,.65); }
+    .hero p { font-family: var(--sans); color: #e7dccb; font-size: 1.12rem; max-width: 520px; margin: 0 auto 2.4rem; text-shadow: 0 1px 10px rgba(0,0,0,.6); }
     .btn {
-      display: inline-block;
-      background: var(--accent);
-      color: #17110c;
-      font-weight: 700;
-      padding: .9rem 2.1rem;
-      border-radius: 999px;
-      text-decoration: none;
-      transition: transform .15s, background .2s;
+      display: inline-block; font-family: var(--sans);
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color: #1a1109; font-weight: 700; letter-spacing: .3px;
+      padding: .95rem 2.4rem; border-radius: 999px; text-decoration: none;
+      box-shadow: 0 8px 24px rgba(232,149,46,.28);
+      transition: transform .15s, box-shadow .2s, filter .2s;
     }
-    .btn:hover { transform: translateY(-2px); background: var(--accent-dark); }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 34px rgba(232,149,46,.42); filter: brightness(1.05); }
 
     /* Section shell */
-    .section { max-width: 1000px; margin: 0 auto; padding: 4.5rem 1.5rem; }
-    .section-title { text-align: center; margin-bottom: 2.5rem; }
-    .section-title h2 { font-size: 2rem; }
+    .section { max-width: 1040px; margin: 0 auto; padding: 5.5rem 1.5rem; }
+    .section-title { text-align: center; margin-bottom: 3rem; }
+    .section-title h2 { font-size: 2.6rem; font-weight: 600; }
     .section-title h2::after {
-      content: ""; display: block; width: 50px; height: 3px; margin: .7rem auto 0;
-      background: linear-gradient(90deg, var(--accent), var(--accent-dark)); border-radius: 3px;
+      content: ""; display: block; width: 60px; height: 1px; margin: 1rem auto 0;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
     }
-    .section-title span { color: var(--accent); font-weight: 600; letter-spacing: 2px; font-size: .8rem; text-transform: uppercase; }
+    .section-title span { font-family: var(--sans); color: var(--gold); font-weight: 600; letter-spacing: 3px; font-size: .74rem; text-transform: uppercase; }
 
     /* Featured dishes with photos */
     .featured { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; }
@@ -175,7 +187,7 @@
       background: linear-gradient(to top, rgba(23,17,12,.5), transparent 42%);
     }
     .dish .body { padding: 1.15rem 1.25rem 1.35rem; }
-    .dish .body h3 { font-size: 1.18rem; }
+    .dish .body h3 { font-size: 1.4rem; font-weight: 600; }
     .dish .body .desc { color: var(--muted); font-size: .9rem; margin: .35rem 0 .8rem; }
     .dish .body .price {
       display: inline-block; color: var(--accent); font-weight: 700; font-size: .95rem;
@@ -186,13 +198,13 @@
     /* Text menu */
     .menu-category { margin-bottom: 3rem; }
     .menu-category > h3 {
-      font-size: 1.4rem; color: var(--accent); letter-spacing: .5px;
-      display: flex; align-items: center; gap: .8rem; margin-bottom: 1.35rem;
+      font-size: 1.7rem; color: var(--gold); letter-spacing: .3px; font-weight: 600;
+      display: flex; align-items: center; gap: .85rem; margin-bottom: 1.4rem;
     }
-    .menu-category > h3::before { content: "◆"; font-size: .75rem; color: var(--accent-dark); }
+    .menu-category > h3::before { content: "◆"; font-size: .7rem; color: var(--gold); opacity: .75; }
     .menu-category > h3::after {
       content: ""; flex: 1; height: 1px;
-      background: linear-gradient(90deg, var(--line), transparent);
+      background: linear-gradient(90deg, rgba(201,161,90,.4), transparent);
     }
     .menu-item {
       display: flex; justify-content: space-between; align-items: baseline;
@@ -211,9 +223,9 @@
 
     /* Atmosphere */
     .atmosphere { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-    .atmosphere .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; align-items: center; }
-    .atmosphere img { width: 100%; height: 340px; object-fit: cover; border-radius: 14px; }
-    .atmosphere .text h2 { font-size: 1.9rem; margin-bottom: .8rem; }
+    .atmosphere .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2.6rem; align-items: center; }
+    .atmosphere img { width: 100%; height: 400px; object-fit: cover; border-radius: 16px; box-shadow: 0 14px 40px rgba(0,0,0,.42); }
+    .atmosphere .text h2 { font-size: 2.4rem; font-weight: 600; margin-bottom: 1rem; }
     .atmosphere .text p { color: var(--muted); }
 
     /* Contact */
@@ -235,19 +247,20 @@
     .ig-btn svg { width: 22px; height: 22px; fill: #fff; }
 
     footer {
-      text-align: center; padding: 1.75rem; color: var(--muted);
+      text-align: center; padding: 2.6rem 1.5rem; color: var(--muted);
       background: var(--bg); font-size: .85rem; border-top: 1px solid var(--line);
     }
-    footer .staff-link {
-      display: inline-block; margin-top: .7rem; color: var(--muted); opacity: .7;
-      text-decoration: none; font-size: .82rem;
-      border: 1px solid var(--line); border-radius: 999px; padding: .25rem .8rem;
-      transition: opacity .2s, color .2s, border-color .2s;
+    footer .fmark {
+      font-family: var(--serif); color: var(--gold); font-size: 1.2rem;
+      display: inline-flex; align-items: center; gap: .6rem; margin-bottom: .55rem;
     }
-    footer .staff-link:hover { opacity: 1; color: var(--accent); border-color: var(--accent); }
+    footer .fmark::before, footer .fmark::after { content: ""; width: 28px; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,161,90,.55)); }
+    footer .fmark::after { transform: scaleX(-1); }
 
     @media (max-width: 640px) {
-      .hero h1 { font-size: 2.1rem; }
+      .hero h1 { font-size: 2.7rem; }
+      .section-title h2 { font-size: 2.1rem; }
+      .atmosphere .grid { gap: 1.5rem; }
       .atmosphere .grid { grid-template-columns: 1fr; }
       nav a { margin-left: .9rem; font-size: .85rem; }
       header { padding: .6rem 1.1rem; }
@@ -343,9 +356,9 @@
   </section>
 
   <footer>
-    © 2026 Bi Üst Kat Gümüşlük Kebap — Tüm hakları saklıdır.
+    <span class="fmark">Bi Üst Kat Gümüşlük</span>
     <br />
-    <a href="/personel.html" class="staff-link">🔒 Personel Girişi</a>
+    © 2026 Bi Üst Kat Gümüşlük Kebap — Tüm hakları saklıdır.
   </footer>
 
   <!-- Yerel önizleme için yedek menü verisi (çevrimiçi iken content/menu.json kullanılır) -->
@@ -427,13 +440,47 @@
     function apply(data){ renderFeatured(data.featured); renderMenu(data.categories); }
 
     (function loadMenu(){
-      fetch("content/menu.json", { cache: "no-store" })
-        .then(function(r){ if(!r.ok) throw new Error("no file"); return r.json(); })
-        .then(apply)
+      function fallbackInline(){
+        try { apply(JSON.parse(document.getElementById("fallback-menu").textContent)); }
+        catch(e){ /* yoksay */ }
+      }
+      // 1) Supabase (Netlify Function) → 2) menu.json → 3) gömülü yedek
+      fetch("/.netlify/functions/menu", { cache: "no-store" })
+        .then(function(r){ if(!r.ok) throw new Error("no fn"); return r.json(); })
+        .then(function(d){ if(!d || (!d.categories && !d.featured)) throw new Error("empty"); apply(d); })
         .catch(function(){
-          try { apply(JSON.parse(document.getElementById("fallback-menu").textContent)); }
-          catch(e){ /* yoksay */ }
+          fetch("content/menu.json", { cache: "no-store" })
+            .then(function(r){ if(!r.ok) throw new Error("no file"); return r.json(); })
+            .then(apply)
+            .catch(fallbackInline);
         });
+    })();
+  </script>
+
+  <script>
+    // Gizli personel erişimi: logoya 5 kez arka arkaya dokun/tıkla
+    (function () {
+      var b = document.querySelector("header .brand");
+      if (!b) return;
+      var n = 0, t;
+      b.addEventListener("click", function () {
+        n++; clearTimeout(t);
+        t = setTimeout(function () { n = 0; }, 1500);
+        if (n >= 5) { n = 0; location.href = "/personel.html"; }
+      });
+    })();
+
+    // Zarif kaydırma animasyonu (JS yoksa içerik normal görünür)
+    (function () {
+      if (!("IntersectionObserver" in window)) return;
+      var els = document.querySelectorAll(".section");
+      els.forEach(function (el) { el.classList.add("reveal"); });
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.1 });
+      els.forEach(function (el) { io.observe(el); });
     })();
   </script>
 </body>

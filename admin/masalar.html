@@ -209,6 +209,52 @@
     .menu-pick-row .price-input { width: 4.4rem; color: var(--accent); font-weight: 700; }
     .menu-pick-row .pw { display: inline-flex; align-items: center; gap: .15rem; color: var(--muted); font-size: .8rem; }
 
+    /* Menü editörü */
+    .me-sec { margin-bottom: 2rem; }
+    .me-h { font-size: 1.15rem; margin-bottom: 1rem; }
+    .me-card, .me-cat { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1rem; margin-bottom: .8rem; box-shadow: 0 1px 4px rgba(0,0,0,.05); }
+    .me-row { margin-bottom: .6rem; }
+    .me-row label { display: block; font-size: .7rem; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-bottom: .25rem; font-weight: 600; }
+    .me-row input, .me-row textarea, .me-in, .me-cat-title {
+      width: 100%; background: #fff; border: 1px solid var(--line); border-radius: 8px;
+      padding: .5rem .6rem; color: var(--text); font: inherit;
+    }
+    .me-row textarea { min-height: 52px; resize: vertical; }
+    .me-cat-head { display: flex; gap: .6rem; align-items: center; margin-bottom: .8rem; }
+    .me-cat-title { font-weight: 700; font-size: 1.05rem; }
+    .me-items { display: flex; flex-direction: column; gap: .5rem; margin-bottom: .7rem; }
+    .me-item { display: flex; gap: .5rem; align-items: center; }
+    .me-item .me-in { flex: 1; }
+    .me-item .me-price { flex: 0 0 5.5rem; text-align: right; color: var(--accent); font-weight: 700; }
+    .me-x { background: none; border: none; color: var(--muted); font-size: 1rem; cursor: pointer; padding: 0 .3rem; }
+    .me-x:hover { color: var(--danger); }
+    .me-save { position: sticky; bottom: 0; padding: 1rem 0 .3rem; margin-top: 1rem; background: linear-gradient(transparent, var(--bg) 45%); }
+    .me-loading { color: var(--muted); padding: 2rem; text-align: center; }
+    @media (max-width: 560px) {
+      .me-item { flex-wrap: wrap; }
+      .me-item .me-price { flex: 1; }
+    }
+
+    /* Ana Sayfa (Gün özeti) */
+    .dash { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+    .dash-card { border-radius: 14px; padding: 1.4rem 1.5rem; color: #fff; box-shadow: 0 4px 16px rgba(0,0,0,.1); }
+    .dash-card.red { background: linear-gradient(135deg, #e0564f, #c9433c); }
+    .dash-card.blue { background: linear-gradient(135deg, #3a6ea5, #2f5c8a); }
+    .dash-card.green { background: linear-gradient(135deg, #3aa76d, #2e8f5b); }
+    .dash-amt { font-size: 2.3rem; font-weight: 800; line-height: 1; }
+    .dash-lbl { font-size: 1rem; margin-top: .45rem; opacity: .95; }
+    .dash-sub { font-size: .82rem; margin-top: .3rem; opacity: .82; }
+    .dash-note { color: var(--muted); font-size: .88rem; margin-top: .5rem; }
+
+    /* Masa ekle modalı */
+    .add-panel { max-width: 420px; }
+    .add-body { padding: 1.1rem 1.4rem 1.5rem; }
+    .add-label { display: block; font-size: .76rem; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 600; margin-bottom: .35rem; }
+    .add-input { width: 100%; background: #fff; border: 1px solid var(--line); border-radius: 9px; padding: .7rem .8rem; font: inherit; color: var(--text); }
+    .add-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,149,46,.15); }
+    .add-hint { color: var(--muted); font-size: .8rem; margin-top: .5rem; }
+    .add-actions { display: flex; gap: .6rem; margin-top: 1.2rem; }
+
     #toast {
       position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
       background: var(--text); color: #fff; padding: .7rem 1.2rem; border-radius: 10px;
@@ -238,19 +284,43 @@
 
     <div class="layout">
       <aside class="sidebar" id="sidebar">
+        <button class="nav-item active" data-view="home" onclick="showView('home')"><span class="ic">📊</span> Ana Sayfa</button>
         <div class="nav-section">Restoran</div>
-        <a class="nav-item active" href="/admin/masalar.html"><span class="ic">🍽️</span> Masalar</a>
-        <a class="nav-item" href="/admin/"><span class="ic">📝</span> Menü Düzenle</a>
+        <button class="nav-item" data-view="tables" onclick="showView('tables')"><span class="ic">🍽️</span> Masalar</button>
+        <button class="nav-item" data-view="menu" onclick="showView('menu')"><span class="ic">📝</span> Menü Düzenle</button>
         <div class="nav-section">Diğer</div>
-        <a class="nav-item" href="/personel.html"><span class="ic">🧭</span> Personel Paneli</a>
         <a class="nav-item" href="/" target="_blank" rel="noopener"><span class="ic">🌐</span> Siteyi Gör</a>
+        <a class="nav-item" href="/personel.html"><span class="ic">🧭</span> Personel Paneli</a>
         <div class="spacer"></div>
         <button class="nav-item logout" onclick="logout()"><span class="ic">⎋</span> Çıkış</button>
-        <div class="sidebar-foot">Bi Üst Kat • Masa Yönetimi</div>
+        <div class="sidebar-foot">Bi Üst Kat POS · v1.0</div>
       </aside>
       <div class="sidebar-backdrop" id="sb-backdrop" onclick="toggleSidebar()"></div>
       <main class="main">
     <div class="wrap">
+      <div id="view-home">
+        <div class="page-head">
+          <div>
+            <h1>Ana Sayfa</h1>
+            <p class="subtitle" id="home-date"></p>
+          </div>
+        </div>
+        <div class="dash">
+          <div class="dash-card red">
+            <div class="dash-amt" id="dash-open-amt">₺0</div>
+            <div class="dash-lbl">Masalarda açık adisyon</div>
+            <div class="dash-sub" id="dash-open-count">0 açık masa</div>
+          </div>
+          <div class="dash-card blue">
+            <div class="dash-amt" id="dash-total-tables">0</div>
+            <div class="dash-lbl">Toplam masa</div>
+            <div class="dash-sub">tanımlı masa</div>
+          </div>
+        </div>
+        <p class="dash-note">💡 Günlük satış / gün sonu raporu bir sonraki adımda eklenecek.</p>
+      </div>
+
+      <div id="view-tables" style="display:none">
       <div class="page-head">
         <div>
           <h1>Masalar</h1>
@@ -259,8 +329,6 @@
         <button class="btn btn-primary" onclick="addTable()">+ Masa Ekle</button>
       </div>
 
-      <div class="summary" id="summary"></div>
-
       <div class="filters">
         <button class="filter-tab active" data-filter="all" onclick="setFilter('all', this)">Tümü</button>
         <button class="filter-tab" data-filter="occupied" onclick="setFilter('occupied', this)">Dolu</button>
@@ -268,6 +336,18 @@
       </div>
 
       <div class="grid" id="grid"></div>
+      </div>
+
+      <div id="view-menu" style="display:none">
+        <div class="page-head">
+          <div>
+            <h1>Menü Düzenle</h1>
+            <p class="subtitle">Değişiklikler kaydedince siteye anında yansır</p>
+          </div>
+          <button class="btn btn-primary" onclick="saveMenu()">💾 Kaydet</button>
+        </div>
+        <div id="menu-editor"></div>
+      </div>
     </div>
       </main>
     </div>
@@ -282,6 +362,24 @@
       <div id="panel-order"></div>
       <div class="add-title">Ürün Ekle</div>
       <div id="panel-body"></div>
+    </div>
+  </div>
+
+  <div class="overlay" id="add-overlay">
+    <div class="panel add-panel">
+      <div class="panel-head">
+        <h2>Yeni Masa</h2>
+        <button class="panel-close" onclick="closeAddTable()" title="Kapat" aria-label="Kapat">✕</button>
+      </div>
+      <div class="add-body">
+        <label class="add-label">Masa adı</label>
+        <input id="add-table-name" class="add-input" placeholder="örn. A1, Teras 2, Paket 1" autocomplete="off" />
+        <p class="add-hint">İpucu: aynı biçimi kullan (A1, A2… veya Masa 1, Masa 2…).</p>
+        <div class="add-actions">
+          <button class="btn btn-primary" onclick="confirmAddTable()">Masayı Ekle</button>
+          <button class="btn btn-outline" onclick="closeAddTable()">İptal</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -323,10 +421,16 @@
 
     async function loadMenu() {
       try {
-        var res = await fetch("/content/menu.json", { cache: "no-store" });
+        var res = await fetch(API + "menu", { cache: "no-store" });
         var data = await res.json();
         menuCategories = data.categories || [];
-      } catch (e) { menuCategories = []; }
+      } catch (e) {
+        try {
+          var r2 = await fetch("/content/menu.json", { cache: "no-store" });
+          var d2 = await r2.json();
+          menuCategories = d2.categories || [];
+        } catch (e2) { menuCategories = []; }
+      }
     }
 
     async function fetchTables() {
@@ -336,18 +440,12 @@
         if (!res.ok) throw new Error(await serverError(res, "Masalar yüklenemedi"));
         lastTables = await res.json();
         renderGrid(lastTables);
+        renderHome();
         if (document.getElementById("overlay").classList.contains("open")) refreshOrderPanel();
       } catch (e) { console.error(e); showToast("Hata: " + e.message); }
     }
 
     function renderGrid(tables) {
-      var openCount = tables.filter(function (t) { return !!t.order_id; }).length;
-      var openSum = tables.reduce(function (s, t) { return s + (t.order_id ? (Number(t.total) || 0) : 0); }, 0);
-      document.getElementById("summary").innerHTML =
-        '<div class="stat"><span class="stat-num">' + openCount + '</span><span class="stat-lbl">Açık masa</span></div>' +
-        '<div class="stat"><span class="stat-num accent">₺' + openSum + '</span><span class="stat-lbl">Masalarda açık</span></div>' +
-        '<div class="stat"><span class="stat-num">' + tables.length + '</span><span class="stat-lbl">Toplam masa</span></div>';
-
       var list = tables.filter(function (t) {
         if (activeFilter === "occupied") return !!t.order_id;
         if (activeFilter === "empty") return !t.order_id;
@@ -444,6 +542,111 @@
       window.netlifyIdentity.logout();
     }
 
+    /* ---- Görünüm değiştirme (Masalar / Menü) ---- */
+    function showView(v) {
+      document.getElementById("view-home").style.display = v === "home" ? "block" : "none";
+      document.getElementById("view-tables").style.display = v === "tables" ? "block" : "none";
+      document.getElementById("view-menu").style.display = v === "menu" ? "block" : "none";
+      var items = document.querySelectorAll(".nav-item[data-view]");
+      for (var i = 0; i < items.length; i++) {
+        items[i].classList.toggle("active", items[i].getAttribute("data-view") === v);
+      }
+      document.getElementById("sidebar").classList.remove("open");
+      document.getElementById("sb-backdrop").classList.remove("show");
+      if (v === "menu") loadMenuEditor();
+      if (v === "home") renderHome();
+    }
+
+    function renderHome() {
+      var tables = lastTables || [];
+      var openCount = tables.filter(function (t) { return !!t.order_id; }).length;
+      var openSum = tables.reduce(function (s, t) { return s + (t.order_id ? (Number(t.total) || 0) : 0); }, 0);
+      var oa = document.getElementById("dash-open-amt"); if (oa) oa.textContent = "₺" + openSum;
+      var oc = document.getElementById("dash-open-count"); if (oc) oc.textContent = openCount + " açık masa";
+      var tt = document.getElementById("dash-total-tables"); if (tt) tt.textContent = tables.length;
+      var hd = document.getElementById("home-date");
+      if (hd) {
+        try { hd.textContent = new Date().toLocaleDateString("tr-TR", { weekday: "long", day: "numeric", month: "long", year: "numeric" }); }
+        catch (e) { hd.textContent = ""; }
+      }
+    }
+
+    /* ---- Menü editörü ---- */
+    var menuDraft = { featured: [], categories: [] };
+    function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+    async function loadMenuEditor() {
+      document.getElementById("menu-editor").innerHTML = '<p class="me-loading">Yükleniyor…</p>';
+      try {
+        var headers = await authHeaders();
+        var res = await fetch(API + "menu", { headers: headers, cache: "no-store" });
+        if (!res.ok) throw new Error(await serverError(res, "Menü yüklenemedi"));
+        var data = await res.json();
+        menuDraft = {
+          featured: (data.featured || []).map(function (d) { return { name: d.name || "", desc: d.desc || "", price: d.price || "", image: d.image || "" }; }),
+          categories: (data.categories || []).map(function (c) {
+            return { title: c.title || "", items: (c.items || []).map(function (i) { return { name: i.name || "", desc: i.desc || "", price: i.price || "" }; }) };
+          }),
+        };
+        renderMenuEditor();
+      } catch (e) {
+        document.getElementById("menu-editor").innerHTML = '<p class="me-loading">Hata: ' + esc(e.message) + "</p>";
+      }
+    }
+
+    function renderMenuEditor() {
+      var f = menuDraft.featured.map(function (d, i) {
+        return '<div class="me-card">' +
+          '<div class="me-row"><label>Yemek Adı</label><input value="' + esc(d.name) + '" oninput="mdFeat(' + i + ",'name',this.value)\"></div>" +
+          '<div class="me-row"><label>Açıklama</label><textarea oninput="mdFeat(' + i + ",'desc',this.value)\">" + esc(d.desc) + "</textarea></div>" +
+          '<div class="me-row"><label>Fiyat</label><input value="' + esc(d.price) + '" placeholder="₺900" oninput="mdFeat(' + i + ",'price',this.value)\"></div>" +
+          '<div class="me-row"><label>Fotoğraf yolu</label><input value="' + esc(d.image) + '" placeholder="image/..." oninput="mdFeat(' + i + ",'image',this.value)\"></div>" +
+          '<button class="btn btn-outline btn-small" onclick="mdFeatDel(' + i + ')">Kaldır</button>' +
+          "</div>";
+      }).join("");
+      var cats = menuDraft.categories.map(function (c, ci) {
+        var items = (c.items || []).map(function (it, ii) {
+          return '<div class="me-item">' +
+            '<input class="me-in" placeholder="Ürün adı" value="' + esc(it.name) + '" oninput="mdItem(' + ci + "," + ii + ",'name',this.value)\">" +
+            '<input class="me-in" placeholder="Açıklama" value="' + esc(it.desc) + '" oninput="mdItem(' + ci + "," + ii + ",'desc',this.value)\">" +
+            '<input class="me-in me-price" placeholder="₺0" value="' + esc(it.price) + '" oninput="mdItem(' + ci + "," + ii + ",'price',this.value)\">" +
+            '<button class="me-x" onclick="mdItemDel(' + ci + "," + ii + ')" title="Sil">✕</button>' +
+            "</div>";
+        }).join("");
+        return '<div class="me-cat">' +
+          '<div class="me-cat-head"><input class="me-cat-title" value="' + esc(c.title) + '" oninput="mdCat(' + ci + ",this.value)\"><button class=\"btn btn-outline btn-small\" onclick=\"mdCatDel(" + ci + ')">Sil</button></div>' +
+          '<div class="me-items">' + items + "</div>" +
+          '<button class="btn btn-outline btn-small" onclick="mdItemAdd(' + ci + ')">+ Ürün</button>' +
+          "</div>";
+      }).join("");
+      document.getElementById("menu-editor").innerHTML =
+        '<section class="me-sec"><h3 class="me-h">🍽️ Öne Çıkan Lezzetler (fotoğraflı)</h3>' + f +
+        '<button class="btn btn-outline btn-small" onclick="mdFeatAdd()">+ Lezzet Ekle</button></section>' +
+        '<section class="me-sec"><h3 class="me-h">📋 Kategoriler</h3>' + cats +
+        '<button class="btn btn-outline" onclick="mdCatAdd()">+ Kategori Ekle</button></section>' +
+        '<div class="me-save"><button class="btn btn-primary" onclick="saveMenu()">💾 Menüyü Kaydet</button></div>';
+    }
+
+    function mdFeat(i, k, v) { menuDraft.featured[i][k] = v; }
+    function mdFeatDel(i) { menuDraft.featured.splice(i, 1); renderMenuEditor(); }
+    function mdFeatAdd() { menuDraft.featured.push({ name: "", desc: "", price: "", image: "" }); renderMenuEditor(); }
+    function mdCat(ci, v) { menuDraft.categories[ci].title = v; }
+    function mdCatDel(ci) { if (!confirm("Bu kategoriyi ve tüm ürünlerini silmek istediğinize emin misiniz?")) return; menuDraft.categories.splice(ci, 1); renderMenuEditor(); }
+    function mdCatAdd() { menuDraft.categories.push({ title: "Yeni Kategori", items: [] }); renderMenuEditor(); }
+    function mdItem(ci, ii, k, v) { menuDraft.categories[ci].items[ii][k] = v; }
+    function mdItemDel(ci, ii) { menuDraft.categories[ci].items.splice(ii, 1); renderMenuEditor(); }
+    function mdItemAdd(ci) { menuDraft.categories[ci].items.push({ name: "", desc: "", price: "" }); renderMenuEditor(); }
+
+    async function saveMenu() {
+      try {
+        var headers = await authHeaders();
+        var res = await fetch(API + "menu", { method: "PUT", headers: headers, body: JSON.stringify(menuDraft) });
+        if (!res.ok) throw new Error(await serverError(res, "Menü kaydedilemedi"));
+        showToast("Menü kaydedildi ✓ Site anında güncellendi");
+        loadMenu();
+      } catch (e) { showToast("Hata: " + e.message); }
+    }
+
     document.getElementById("panel-body").addEventListener("click", function (e) {
       var btn = e.target.closest(".add-btn");
       if (!btn) return;
@@ -451,6 +654,13 @@
     });
     document.getElementById("overlay").addEventListener("click", function (e) {
       if (e.target === this) closePanel();
+    });
+    document.getElementById("add-overlay").addEventListener("click", function (e) {
+      if (e.target === this) closeAddTable();
+    });
+    document.getElementById("add-table-name").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") confirmAddTable();
+      if (e.key === "Escape") closeAddTable();
     });
 
     async function addItem(name, priceInputId, qtyInputId) {
@@ -520,15 +730,26 @@
       } catch (e) { showToast("Hata: " + e.message); }
     }
 
-    async function addTable() {
-      var name = prompt("Yeni masa adı (örn. A1, Teras 2):");
-      if (!name || !name.trim()) return;
+    function addTable() {
+      var inp = document.getElementById("add-table-name");
+      inp.value = "";
+      document.getElementById("add-overlay").classList.add("open");
+      setTimeout(function () { inp.focus(); }, 50);
+    }
+    function closeAddTable() {
+      document.getElementById("add-overlay").classList.remove("open");
+    }
+    async function confirmAddTable() {
+      var name = document.getElementById("add-table-name").value.trim();
+      if (!name) { showToast("Masa adı gerekli"); return; }
       try {
         var headers = await authHeaders();
         var res = await fetch(API + "tables", {
-          method: "POST", headers: headers, body: JSON.stringify({ name: name.trim() }),
+          method: "POST", headers: headers, body: JSON.stringify({ name: name }),
         });
         if (!res.ok) throw new Error(await serverError(res, "Masa eklenemedi"));
+        showToast(name + " eklendi");
+        closeAddTable();
         fetchTables();
       } catch (e) { showToast("Hata: " + e.message); }
     }

@@ -23,35 +23,101 @@
     {
       "title": "Başlangıçlar & Mezeler",
       "items": [
-        { "name": "Arnavut Ciğeri", "desc": "Çıtır ciğer, sumaklı soğan salatası ile", "price": "₺260" },
-        { "name": "Humus", "desc": "Nohut, tahin, zeytinyağı", "price": "₺95" },
-        { "name": "Acılı Ezme", "desc": "Domates, biber, ceviz", "price": "₺350" },
-        { "name": "Haydari", "desc": "Süzme yoğurt, nane, sarımsak", "price": "₺350" }
+        {
+          "name": "Arnavut Ciğeri",
+          "desc": "Çıtır ciğer, sumaklı soğan salatası ile",
+          "price": "₺260"
+        },
+        {
+          "name": "Humus",
+          "desc": "Nohut, tahin, zeytinyağı",
+          "price": "₺95"
+        },
+        {
+          "name": "Acılı Ezme",
+          "desc": "Domates, biber, ceviz",
+          "price": "₺350"
+        },
+        {
+          "name": "Haydari",
+          "desc": "Süzme yoğurt, nane, sarımsak",
+          "price": "₺350"
+        }
       ]
     },
     {
       "title": "Ana Yemekler / Kebaplar",
       "items": [
-        { "name": "Adana Kebap", "desc": "Peynirli pide ve közlenmiş sebze ile", "price": "₺900" },
-        { "name": "Urfa Kebap", "desc": "Acısız, közlenmiş sebze ile", "price": "₺900" },
-        { "name": "Kavurma Tabağı", "desc": "Patates kızartması ve salata ile", "price": "₺290" },
-        { "name": "Karışık Izgara", "desc": "Adana, tavuk, kanat, köfte (2 kişilik)", "price": "₺750" },
-        { "name": "Tavuk Şiş", "desc": "Marine tavuk, ızgara sebze ile", "price": "₺750" }
+        {
+          "name": "Adana Kebap",
+          "desc": "Peynirli pide ve közlenmiş sebze ile",
+          "price": "₺900"
+        },
+        {
+          "name": "Urfa Kebap",
+          "desc": "Acısız, közlenmiş sebze ile",
+          "price": "₺900"
+        },
+        {
+          "name": "Kavurma Tabağı",
+          "desc": "Patates kızartması ve salata ile",
+          "price": "₺290"
+        },
+        {
+          "name": "Karışık Izgara",
+          "desc": "Adana, tavuk, kanat, köfte (2 kişilik)",
+          "price": "₺750"
+        },
+        {
+          "name": "Tavuk Şiş",
+          "desc": "Marine tavuk, ızgara sebze ile",
+          "price": "₺750"
+        }
       ]
     },
     {
       "title": "Tatlılar",
       "items": [
-        { "name": "Künefe", "desc": "Antep fıstığı ve kaymak ile", "price": "₺400" },
-        { "name": "Sütlaç", "desc": "Fırında, tarçınlı", "price": "₺400" }
+        {
+          "name": "Künefe",
+          "desc": "Antep fıstığı ve kaymak ile",
+          "price": "₺400"
+        },
+        {
+          "name": "Sütlaç",
+          "desc": "Fırında, tarçınlı",
+          "price": "₺400"
+        }
       ]
     },
     {
       "title": "Soğuk İçecekler",
       "items": [
-        { "name": "Ev Yapımı Limonata", "desc": "Taze nane ve limon", "price": "₺150" },
-        { "name": "Ayran", "desc": "Yayık ayranı", "price": "₺150" },
-        { "name": "Şalgam Suyu", "desc": "Acılı / acısız", "price": "₺100" }
+        {
+          "name": "Ev Yapımı Limonata",
+          "desc": "Taze nane ve limon",
+          "price": "₺150"
+        },
+        {
+          "name": "Ayran",
+          "desc": "Yayık ayranı",
+          "price": "₺150"
+        },
+        {
+          "name": "Şalgam Suyu",
+          "desc": "Acılı / acısız",
+          "price": "₺100"
+        }
+      ]
+    },
+    {
+      "title": "İÇECEKLER",
+      "items": [
+        {
+          "name": "ŞARAP",
+          "desc": "70 cl",
+          "price": "1200"
+        }
       ]
     }
   ]
