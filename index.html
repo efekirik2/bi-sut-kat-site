@@ -397,11 +397,11 @@
   </script>
 
   <script>
-    // Davet linkiyle gelen kullanıcıyı, giriş sonrası panele yönlendir
+    // Davet linkiyle gelen kullanıcıyı, giriş sonrası personel paneline yönlendir
     if (window.netlifyIdentity) {
       window.netlifyIdentity.on("init", function(user){
         if (!user) {
-          window.netlifyIdentity.on("login", function(){ document.location.href = "/admin/"; });
+          window.netlifyIdentity.on("login", function(){ document.location.href = "/personel.html"; });
         }
       });
     }

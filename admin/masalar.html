@@ -143,6 +143,21 @@
     .tile-total { font-size: 1rem; font-weight: 800; color: var(--accent); }
     .tile-empty { font-size: .7rem; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); }
     .grid-empty { color: var(--muted); padding: 2rem; text-align: center; }
+    /* Sıralama modu */
+    .arrange-banner {
+      background: rgba(232,149,46,.12); border: 1px solid rgba(232,149,46,.35);
+      color: var(--accent-dark); padding: .75rem 1rem; border-radius: 10px;
+      margin-bottom: 1.2rem; font-size: .9rem;
+    }
+    .table-tile.arrange { flex-direction: row; justify-content: space-between; gap: .4rem; cursor: default; padding: .8rem .6rem; }
+    .table-tile.arrange:hover { transform: none; box-shadow: 0 1px 5px rgba(0,0,0,.05); border-color: var(--line); }
+    .table-tile.arrange .tile-name { font-size: 1rem; flex: 1; }
+    .table-tile .mv {
+      background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+      width: 2.1rem; height: 2.1rem; font-size: .9rem; color: var(--text); cursor: pointer; flex-shrink: 0;
+    }
+    .table-tile .mv:hover:not(:disabled) { border-color: var(--accent); color: var(--accent-dark); }
+    .table-tile .mv:disabled { opacity: .3; cursor: default; }
 
     /* Modal */
     .overlay {
@@ -326,10 +341,17 @@
           <h1>Masalar</h1>
           <p class="subtitle">Sipariş almak için masaya tıkla</p>
         </div>
-        <button class="btn btn-primary" onclick="addTable()">+ Masa Ekle</button>
+        <div style="display:flex; gap:.5rem; flex-wrap:wrap;">
+          <button class="btn btn-outline" id="arrange-btn" onclick="toggleArrange()">⇄ Sırala</button>
+          <button class="btn btn-primary" onclick="addTable()">+ Masa Ekle</button>
+        </div>
       </div>
 
-      <div class="filters">
+      <div id="arrange-banner" class="arrange-banner" style="display:none">
+        <span>◀ ▶ oklarıyla masaları istediğin sıraya diz. Bitince <b>"✓ Bitti"</b>ye bas.</span>
+      </div>
+
+      <div class="filters" id="filters">
         <button class="filter-tab active" data-filter="all" onclick="setFilter('all', this)">Tümü</button>
         <button class="filter-tab" data-filter="occupied" onclick="setFilter('occupied', this)">Dolu</button>
         <button class="filter-tab" data-filter="empty" onclick="setFilter('empty', this)">Boş</button>
@@ -391,6 +413,7 @@
     var lastTables = [];
     var currentTableId = null;
     var activeFilter = "all";
+    var arrangeMode = false;
     var pollTimer = null;
     var LOCAL = location.hostname === "localhost" || location.hostname === "127.0.0.1";
 
@@ -446,12 +469,23 @@
     }
 
     function renderGrid(tables) {
+      var grid = document.getElementById("grid");
+      if (arrangeMode) {
+        var arr = tables || [];
+        grid.innerHTML = arr.map(function (t, i) {
+          return '<div class="table-tile arrange' + (t.order_id ? " occupied" : "") + '">' +
+            '<button class="mv" ' + (i === 0 ? "disabled" : "") + ' onclick="moveTable(\'' + t.id + '\', -1)" title="Öne al">◀</button>' +
+            '<span class="tile-name">' + esc(t.name) + "</span>" +
+            '<button class="mv" ' + (i === arr.length - 1 ? "disabled" : "") + ' onclick="moveTable(\'' + t.id + '\', 1)" title="Geri al">▶</button>' +
+            "</div>";
+        }).join("");
+        return;
+      }
       var list = tables.filter(function (t) {
         if (activeFilter === "occupied") return !!t.order_id;
         if (activeFilter === "empty") return !t.order_id;
         return true;
       });
-      var grid = document.getElementById("grid");
       if (!list.length) { grid.innerHTML = '<p class="grid-empty">Bu filtrede masa yok.</p>'; return; }
       grid.innerHTML = list.map(function (t) {
         var occupied = !!t.order_id;
@@ -469,6 +503,50 @@
       for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove("active");
       btn.classList.add("active");
       renderGrid(lastTables);
+    }
+
+    function toggleArrange() {
+      arrangeMode = !arrangeMode;
+      var btn = document.getElementById("arrange-btn");
+      var banner = document.getElementById("arrange-banner");
+      var filters = document.getElementById("filters");
+      if (arrangeMode) {
+        if (pollTimer) clearInterval(pollTimer); // sıralarken poll durur
+        btn.textContent = "✓ Bitti";
+        btn.classList.remove("btn-outline"); btn.classList.add("btn-primary");
+        banner.style.display = "block";
+        filters.style.display = "none";
+      } else {
+        btn.textContent = "⇄ Sırala";
+        btn.classList.remove("btn-primary"); btn.classList.add("btn-outline");
+        banner.style.display = "none";
+        filters.style.display = "flex";
+        if (pollTimer) clearInterval(pollTimer);
+        pollTimer = setInterval(fetchTables, 5000);
+        fetchTables();
+      }
+      renderGrid(lastTables);
+    }
+
+    async function moveTable(id, dir) {
+      var ids = lastTables.map(function (t) { return t.id; });
+      var idx = ids.indexOf(id);
+      var j = idx + dir;
+      if (idx < 0 || j < 0 || j >= ids.length) return;
+      ids.splice(idx, 1);
+      ids.splice(j, 0, id);
+      // Anında yerelde uygula, sonra sunucuya kaydet
+      var map = {};
+      lastTables.forEach(function (t) { map[t.id] = t; });
+      lastTables = ids.map(function (x) { return map[x]; });
+      renderGrid(lastTables);
+      try {
+        var headers = await authHeaders();
+        var res = await fetch(API + "tables", { method: "PATCH", headers: headers, body: JSON.stringify({ order: ids }) });
+        if (!res.ok) throw new Error(await serverError(res, "Sıra kaydedilemedi"));
+      } catch (e) {
+        showToast("Hata: " + e.message);
+      }
     }
 
     function renderOrderSection(t) {

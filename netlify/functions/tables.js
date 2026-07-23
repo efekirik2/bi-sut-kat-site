@@ -5,9 +5,15 @@ exports.handler = wrap(async (event, context) => {
   if (!user) return json(401, { error: "Giriş yapmanız gerekiyor." });
 
   if (event.httpMethod === "GET") {
-    const rows = await sb(
-      "/tables?select=id,name,created_at,orders(id,opened_at,order_items(id,name,price,quantity,note))&orders.status=eq.open&order=created_at.asc"
-    );
+    const sel = "select=id,name,created_at,orders(id,opened_at,order_items(id,name,price,quantity,note))&orders.status=eq.open";
+    let rows;
+    try {
+      // position kolonu varsa ona göre sırala
+      rows = await sb("/tables?" + sel + "&order=position.asc,created_at.asc");
+    } catch (e) {
+      // kolon henüz yoksa eski sıralamaya düş (bozulmadan çalışır)
+      rows = await sb("/tables?" + sel + "&order=created_at.asc");
+    }
     const withTotals = (rows || []).map((t) => {
       const order = (t.orders || [])[0] || null;
       const items = order ? order.order_items || [] : [];
@@ -33,6 +39,19 @@ exports.handler = wrap(async (event, context) => {
       body: JSON.stringify([{ name }]),
     });
     return json(201, created);
+  }
+
+  if (event.httpMethod === "PATCH") {
+    const body = JSON.parse(event.body || "{}");
+    if (!Array.isArray(body.order) || !body.order.length) {
+      return json(400, { error: "order dizisi gerekli." });
+    }
+    // Masaların sırasını (position) gelen id dizisine göre günceller.
+    await sb("/rpc/reorder_tables", {
+      method: "POST",
+      body: JSON.stringify({ ids: body.order }),
+    });
+    return json(200, { ok: true });
   }
 
   if (event.httpMethod === "DELETE") {
