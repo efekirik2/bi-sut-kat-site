@@ -260,6 +260,14 @@
     .dash-lbl { font-size: 1rem; margin-top: .45rem; opacity: .95; }
     .dash-sub { font-size: .82rem; margin-top: .3rem; opacity: .82; }
     .dash-note { color: var(--muted); font-size: .88rem; margin-top: .5rem; }
+    /* Gün Sonu raporu */
+    .report-date { background: #fff; border: 1px solid var(--line); border-radius: 9px; padding: .5rem .7rem; font: inherit; color: var(--text); }
+    .rep-h { font-size: 1.1rem; margin: 1.4rem 0 .8rem; }
+    .rep-row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: .7rem 1rem; margin-bottom: .5rem; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
+    .rep-row .rep-table { font-weight: 700; }
+    .rep-row .rep-time { color: var(--muted); font-size: .82rem; }
+    .rep-row .rep-amt { color: var(--accent); font-weight: 800; font-size: 1.05rem; }
+    .rep-empty { color: var(--muted); padding: 1.5rem; text-align: center; font-style: italic; }
 
     /* Masa ekle modalı */
     .add-panel { max-width: 420px; }
@@ -303,6 +311,7 @@
         <div class="nav-section">Restoran</div>
         <button class="nav-item" data-view="tables" onclick="showView('tables')"><span class="ic">🍽️</span> Masalar</button>
         <button class="nav-item" data-view="menu" onclick="showView('menu')"><span class="ic">📝</span> Menü Düzenle</button>
+        <button class="nav-item" data-view="report" onclick="showView('report')"><span class="ic">📅</span> Gün Sonu</button>
         <div class="nav-section">Diğer</div>
         <a class="nav-item" href="/" target="_blank" rel="noopener"><span class="ic">🌐</span> Siteyi Gör</a>
         <a class="nav-item" href="/personel.html"><span class="ic">🧭</span> Personel Paneli</a>
@@ -326,13 +335,20 @@
             <div class="dash-lbl">Masalarda açık adisyon</div>
             <div class="dash-sub" id="dash-open-count">0 açık masa</div>
           </div>
+          <div class="dash-card green">
+            <div class="dash-amt" id="dash-sales-amt">₺0</div>
+            <div class="dash-lbl">Bugünkü satış</div>
+            <div class="dash-sub" id="dash-sales-count">0 kapatılan adisyon</div>
+          </div>
           <div class="dash-card blue">
             <div class="dash-amt" id="dash-total-tables">0</div>
             <div class="dash-lbl">Toplam masa</div>
             <div class="dash-sub">tanımlı masa</div>
           </div>
         </div>
-        <p class="dash-note">💡 Günlük satış / gün sonu raporu bir sonraki adımda eklenecek.</p>
+        <div style="margin-top:1.1rem">
+          <button class="btn btn-outline" onclick="showView('report')">📅 Gün Sonu Raporu →</button>
+        </div>
       </div>
 
       <div id="view-tables" style="display:none">
@@ -369,6 +385,25 @@
           <button class="btn btn-primary" onclick="saveMenu()">💾 Kaydet</button>
         </div>
         <div id="menu-editor"></div>
+      </div>
+
+      <div id="view-report" style="display:none">
+        <div class="page-head">
+          <div>
+            <h1>Gün Sonu Raporu</h1>
+            <p class="subtitle">Kapatılan hesapların günlük özeti</p>
+          </div>
+          <input type="date" id="report-date" class="report-date" onchange="loadReport()" />
+        </div>
+        <div class="dash">
+          <div class="dash-card green">
+            <div class="dash-amt" id="rep-total">₺0</div>
+            <div class="dash-lbl">Toplam satış</div>
+            <div class="dash-sub" id="rep-count">0 adisyon</div>
+          </div>
+        </div>
+        <h3 class="rep-h">Kapatılan Adisyonlar</h3>
+        <div id="report-list"></div>
       </div>
     </div>
       </main>
@@ -625,6 +660,7 @@
       document.getElementById("view-home").style.display = v === "home" ? "block" : "none";
       document.getElementById("view-tables").style.display = v === "tables" ? "block" : "none";
       document.getElementById("view-menu").style.display = v === "menu" ? "block" : "none";
+      document.getElementById("view-report").style.display = v === "report" ? "block" : "none";
       var items = document.querySelectorAll(".nav-item[data-view]");
       for (var i = 0; i < items.length; i++) {
         items[i].classList.toggle("active", items[i].getAttribute("data-view") === v);
@@ -632,7 +668,62 @@
       document.getElementById("sidebar").classList.remove("open");
       document.getElementById("sb-backdrop").classList.remove("show");
       if (v === "menu") loadMenuEditor();
-      if (v === "home") renderHome();
+      if (v === "home") { renderHome(); loadTodaySales(); }
+      if (v === "report") loadReport();
+    }
+
+    /* ---- Gün Sonu / satış raporu ---- */
+    function dayRange(dateStr) {
+      var d = dateStr ? new Date(dateStr + "T00:00:00") : new Date();
+      var start = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0);
+      var end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
+      return { from: start.toISOString(), to: end.toISOString() };
+    }
+
+    async function loadTodaySales() {
+      try {
+        var r = dayRange();
+        var headers = await authHeaders();
+        var res = await fetch(API + "report?from=" + encodeURIComponent(r.from) + "&to=" + encodeURIComponent(r.to), { headers: headers, cache: "no-store" });
+        if (!res.ok) return;
+        var data = await res.json();
+        var a = document.getElementById("dash-sales-amt"); if (a) a.textContent = "₺" + Math.round(data.total);
+        var c = document.getElementById("dash-sales-count"); if (c) c.textContent = data.count + " kapatılan adisyon";
+      } catch (e) {}
+    }
+
+    async function loadReport() {
+      var di = document.getElementById("report-date");
+      if (!di.value) {
+        var t = new Date();
+        di.value = t.getFullYear() + "-" + String(t.getMonth() + 1).padStart(2, "0") + "-" + String(t.getDate()).padStart(2, "0");
+      }
+      document.getElementById("report-list").innerHTML = '<p class="rep-empty">Yükleniyor…</p>';
+      try {
+        var r = dayRange(di.value);
+        var headers = await authHeaders();
+        var res = await fetch(API + "report?from=" + encodeURIComponent(r.from) + "&to=" + encodeURIComponent(r.to), { headers: headers, cache: "no-store" });
+        if (!res.ok) throw new Error(await serverError(res, "Rapor yüklenemedi"));
+        renderReport(await res.json());
+      } catch (e) {
+        document.getElementById("report-list").innerHTML = '<p class="rep-empty">Hata: ' + esc(e.message) + "</p>";
+      }
+    }
+
+    function renderReport(data) {
+      document.getElementById("rep-total").textContent = "₺" + Math.round(data.total || 0);
+      document.getElementById("rep-count").textContent = (data.count || 0) + " adisyon";
+      var list = document.getElementById("report-list");
+      if (!data.bills || !data.bills.length) {
+        list.innerHTML = '<p class="rep-empty">Bu tarihte kapatılan hesap yok.</p>';
+        return;
+      }
+      list.innerHTML = data.bills.map(function (b) {
+        var t = new Date(b.closed_at);
+        var time = isNaN(t.getTime()) ? "" : t.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+        return '<div class="rep-row"><div><span class="rep-table">' + esc(b.table) + '</span> <span class="rep-time">' + time + "</span></div>" +
+          '<span class="rep-amt">₺' + Math.round(b.total) + "</span></div>";
+      }).join("");
     }
 
     function renderHome() {
@@ -793,6 +884,7 @@
         showToast("Hesap kapatıldı: ₺" + data.total);
         closePanel();
         fetchTables();
+        loadTodaySales();
       } catch (e) { showToast("Hata: " + e.message); }
     }
 
@@ -836,6 +928,7 @@
       document.getElementById("login-gate").style.display = "none";
       document.getElementById("app").style.display = "block";
       loadMenu().then(fetchTables);
+      loadTodaySales();
       if (pollTimer) clearInterval(pollTimer);
       pollTimer = setInterval(fetchTables, 5000);
     }
