@@ -7,13 +7,13 @@ exports.handler = async (event, context) => {
     const [featured, cats, items] = await Promise.all([
       sb("/featured_dishes?select=name,description,price,image&order=position.asc"),
       sb("/menu_categories?select=id,title&order=position.asc"),
-      sb("/menu_items?select=category_id,name,description,price&order=position.asc"),
+      sb("/menu_items?select=category_id,name,description,price,image&order=position.asc"),
     ]);
     const categories = (cats || []).map((c) => ({
       title: c.title,
       items: (items || [])
         .filter((i) => i.category_id === c.id)
-        .map((i) => ({ name: i.name, desc: i.description || "", price: i.price })),
+        .map((i) => ({ name: i.name, desc: i.description || "", price: i.price, image: i.image || "" })),
     }));
     const featuredOut = (featured || []).map((f) => ({
       name: f.name,
