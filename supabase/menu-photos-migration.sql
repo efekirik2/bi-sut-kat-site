@@ -18,64 +18,58 @@ alter table site_settings enable row level security;
 
 -- 3) replace_menu fonksiyonunu, kategori ürünlerinin fotoğrafını da
 --    kaydedecek şekilde güncelle. Panelden "Kaydet" bu fonksiyonu çağırır.
+--    ÖNEMLİ: DELETE'ler "where true" ile yazılır — Supabase WHERE'siz DELETE'i
+--    reddeder ("DELETE requires a WHERE clause"). Orijinal şemadaki kalıp korunur;
+--    tek fark: menu_items insert'ine "image" kolonu eklendi.
 create or replace function replace_menu(data jsonb)
 returns void
 language plpgsql
-security definer
 as $$
 declare
-  f          jsonb;
-  c          jsonb;
-  it         jsonb;
+  cat        jsonb;
+  itm        jsonb;
+  feat       jsonb;
   new_cat_id uuid;
-  pos        int;
-  ipos       int;
+  ci int := 0;
+  ii int;
+  fi int := 0;
 begin
-  -- Önce her şeyi temizle (kategori silinince ürünler cascade ile gider,
-  -- yine de garanti olsun diye açıkça siliyoruz).
-  delete from menu_items;
-  delete from menu_categories;
-  delete from featured_dishes;
+  delete from menu_items where true;
+  delete from menu_categories where true;
+  delete from featured_dishes where true;
 
-  -- Öne çıkan lezzetler
-  pos := 0;
-  for f in select * from jsonb_array_elements(coalesce(data->'featured', '[]'::jsonb))
-  loop
-    insert into featured_dishes (name, description, price, image, position)
+  for feat in select * from jsonb_array_elements(coalesce(data->'featured', '[]'::jsonb)) loop
+    insert into featured_dishes(name, description, price, image, position)
     values (
-      nullif(f->>'name', ''),
-      f->>'desc',
-      f->>'price',
-      f->>'image',
-      pos
+      coalesce(feat->>'name',''),
+      feat->>'desc',
+      coalesce(feat->>'price',''),
+      feat->>'image',
+      fi
     );
-    pos := pos + 1;
+    fi := fi + 1;
   end loop;
 
-  -- Kategoriler ve ürünleri
-  pos := 0;
-  for c in select * from jsonb_array_elements(coalesce(data->'categories', '[]'::jsonb))
-  loop
-    insert into menu_categories (title, position)
-    values (c->>'title', pos)
+  for cat in select * from jsonb_array_elements(coalesce(data->'categories', '[]'::jsonb)) loop
+    insert into menu_categories(title, position)
+    values (coalesce(cat->>'title',''), ci)
     returning id into new_cat_id;
 
-    ipos := 0;
-    for it in select * from jsonb_array_elements(coalesce(c->'items', '[]'::jsonb))
-    loop
-      insert into menu_items (category_id, name, description, price, image, position)
+    ii := 0;
+    for itm in select * from jsonb_array_elements(coalesce(cat->'items', '[]'::jsonb)) loop
+      insert into menu_items(category_id, name, description, price, image, position)
       values (
         new_cat_id,
-        it->>'name',
-        it->>'desc',
-        it->>'price',
-        it->>'image',
-        ipos
+        coalesce(itm->>'name',''),
+        itm->>'desc',
+        coalesce(itm->>'price',''),
+        itm->>'image',
+        ii
       );
-      ipos := ipos + 1;
+      ii := ii + 1;
     end loop;
 
-    pos := pos + 1;
+    ci := ci + 1;
   end loop;
 end;
 $$;
