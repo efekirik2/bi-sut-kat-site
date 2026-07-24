@@ -18,14 +18,21 @@ exports.handler = wrap(async (event, context) => {
   const items = await sb("/order_items?order_id=eq." + orderId + "&select=price,quantity");
   const total = (items || []).reduce((sum, i) => sum + Number(i.price) * i.quantity, 0);
 
-  await sb("/orders?id=eq." + orderId, {
-    method: "PATCH",
-    body: JSON.stringify({
-      status: "closed",
-      closed_at: new Date().toISOString(),
-      total,
-    }),
-  });
+  const patch = {
+    status: "closed",
+    closed_at: new Date().toISOString(),
+    total,
+  };
+  const paymentMethod = (body.payment_method || "").trim();
+  if (paymentMethod) patch.payment_method = paymentMethod;
+
+  try {
+    await sb("/orders?id=eq." + orderId, { method: "PATCH", body: JSON.stringify(patch) });
+  } catch (e) {
+    // payment_method kolonu henüz yoksa onsuz kapat (bozulmadan çalışır)
+    delete patch.payment_method;
+    await sb("/orders?id=eq." + orderId, { method: "PATCH", body: JSON.stringify(patch) });
+  }
 
   return json(200, { ok: true, total });
 });

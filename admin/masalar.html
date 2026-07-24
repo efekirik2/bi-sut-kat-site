@@ -277,6 +277,13 @@
     .add-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,149,46,.15); }
     .add-hint { color: var(--muted); font-size: .8rem; margin-top: .5rem; }
     .add-actions { display: flex; gap: .6rem; margin-top: 1.2rem; }
+    .pay-total { font-size: 1.4rem; font-weight: 800; color: var(--accent); margin-bottom: 1rem; }
+    .pay-methods { display: flex; gap: .6rem; flex-wrap: wrap; }
+    .pay-methods .btn { flex: 1; min-width: 6rem; justify-content: center; }
+    .rep-break { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: .6rem; margin-bottom: 1rem; }
+    .rep-break .b { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: .6rem .8rem; }
+    .rep-break .b .amt { font-weight: 800; font-size: 1.1rem; }
+    .rep-break .b .lbl { color: var(--muted); font-size: .78rem; }
 
     #toast {
       position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
@@ -402,6 +409,7 @@
             <div class="dash-sub" id="rep-count">0 adisyon</div>
           </div>
         </div>
+        <div class="rep-break" id="rep-break"></div>
         <h3 class="rep-h">Kapatılan Adisyonlar</h3>
         <div id="report-list"></div>
       </div>
@@ -436,6 +444,25 @@
           <button class="btn btn-primary" onclick="confirmAddTable()">Masayı Ekle</button>
           <button class="btn btn-outline" onclick="closeAddTable()">İptal</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="pay-overlay">
+    <div class="panel add-panel">
+      <div class="panel-head">
+        <h2>Hesabı Kapat</h2>
+        <button class="panel-close" onclick="closePayModal()" title="Kapat" aria-label="Kapat">✕</button>
+      </div>
+      <div class="add-body">
+        <p class="pay-total" id="pay-total">Toplam: ₺0</p>
+        <p class="add-label">Ödeme yöntemi</p>
+        <div class="pay-methods">
+          <button class="btn btn-primary" onclick="doCloseBill('nakit')">💵 Nakit</button>
+          <button class="btn btn-primary" onclick="doCloseBill('kart')">💳 Kart</button>
+          <button class="btn btn-outline" onclick="doCloseBill('diğer')">Diğer</button>
+        </div>
+        <button class="btn btn-outline" style="margin-top:1rem" onclick="closePayModal()">İptal</button>
       </div>
     </div>
   </div>
@@ -713,6 +740,13 @@
     function renderReport(data) {
       document.getElementById("rep-total").textContent = "₺" + Math.round(data.total || 0);
       document.getElementById("rep-count").textContent = (data.count || 0) + " adisyon";
+      var bm = data.byMethod || { nakit: 0, kart: 0, diger: 0, belirsiz: 0 };
+      var breakEl = document.getElementById("rep-break");
+      breakEl.innerHTML =
+        '<div class="b"><div class="amt">₺' + Math.round(bm.nakit) + '</div><div class="lbl">💵 Nakit</div></div>' +
+        '<div class="b"><div class="amt">₺' + Math.round(bm.kart) + '</div><div class="lbl">💳 Kart</div></div>' +
+        (bm.diger ? '<div class="b"><div class="amt">₺' + Math.round(bm.diger) + '</div><div class="lbl">Diğer</div></div>' : "") +
+        (bm.belirsiz ? '<div class="b"><div class="amt">₺' + Math.round(bm.belirsiz) + '</div><div class="lbl">Belirsiz</div></div>' : "");
       var list = document.getElementById("report-list");
       if (!data.bills || !data.bills.length) {
         list.innerHTML = '<p class="rep-empty">Bu tarihte kapatılan hesap yok.</p>';
@@ -721,7 +755,10 @@
       list.innerHTML = data.bills.map(function (b) {
         var t = new Date(b.closed_at);
         var time = isNaN(t.getTime()) ? "" : t.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
-        return '<div class="rep-row"><div><span class="rep-table">' + esc(b.table) + '</span> <span class="rep-time">' + time + "</span></div>" +
+        var pm = (b.payment || "").toLowerCase();
+        var icon = pm === "nakit" ? "💵" : pm === "kart" ? "💳" : pm ? "•" : "";
+        return '<div class="rep-row"><div><span class="rep-table">' + esc(b.table) + '</span> <span class="rep-time">' + time +
+          (icon ? " " + icon + " " + esc(b.payment) : "") + "</span></div>" +
           '<span class="rep-amt">₺' + Math.round(b.total) + "</span></div>";
       }).join("");
     }
@@ -827,6 +864,9 @@
     document.getElementById("add-overlay").addEventListener("click", function (e) {
       if (e.target === this) closeAddTable();
     });
+    document.getElementById("pay-overlay").addEventListener("click", function (e) {
+      if (e.target === this) closePayModal();
+    });
     document.getElementById("add-table-name").addEventListener("keydown", function (e) {
       if (e.key === "Enter") confirmAddTable();
       if (e.key === "Escape") closeAddTable();
@@ -872,16 +912,30 @@
       } catch (e) { showToast("Hata: " + e.message); }
     }
 
-    async function closeBill(tableId) {
-      if (!confirm("Bu masanın hesabını kapatmak istediğinize emin misiniz?")) return;
+    var pendingCloseTableId = null;
+    function closeBill(tableId) {
+      pendingCloseTableId = tableId;
+      var t = lastTables.find(function (x) { return x.id === tableId; });
+      document.getElementById("pay-total").textContent = "Toplam: ₺" + (t ? t.total : 0);
+      document.getElementById("pay-overlay").classList.add("open");
+    }
+    function closePayModal() {
+      document.getElementById("pay-overlay").classList.remove("open");
+      pendingCloseTableId = null;
+    }
+    async function doCloseBill(method) {
+      var tableId = pendingCloseTableId;
+      if (!tableId) return;
       try {
         var headers = await authHeaders();
         var res = await fetch(API + "order-close", {
-          method: "POST", headers: headers, body: JSON.stringify({ table_id: tableId }),
+          method: "POST", headers: headers,
+          body: JSON.stringify({ table_id: tableId, payment_method: method }),
         });
         if (!res.ok) throw new Error(await serverError(res, "Hesap kapatılamadı"));
         var data = await res.json();
-        showToast("Hesap kapatıldı: ₺" + data.total);
+        showToast("Hesap kapatıldı (" + method + "): ₺" + data.total);
+        closePayModal();
         closePanel();
         fetchTables();
         loadTodaySales();
